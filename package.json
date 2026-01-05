@@ -27,6 +27,7 @@
     "@prisma/adapter-neon": "^7.2.0",
     "@prisma/client": "^7.2.0",
     "@t3-oss/env-core": "^0.13.8",
+    "@tabler/icons-react": "^3.36.1",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-query": "^5.90.16",
