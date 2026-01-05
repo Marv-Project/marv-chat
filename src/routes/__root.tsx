@@ -10,6 +10,8 @@ import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import appCss from '../styles.css?url'
 import type { QueryClient } from '@tanstack/react-query'
 import type { orpc } from '@/orpc/client'
+import { ThemeProvider } from '@/components/providers/theme-provider'
+import { Toaster } from '@/components/ui/sonner'
 
 interface MyRouterContext {
   orpc: typeof orpc
@@ -48,7 +50,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          {children}
+          <Toaster position="top-center" richColors />
+        </ThemeProvider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',

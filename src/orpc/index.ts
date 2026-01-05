@@ -20,6 +20,6 @@ const requireAuth = o.middleware(async ({ next, context }) => {
   })
 })
 
-export const publicProcedure = o.use(requireAuth)
+export const publicProcedure = o
 
 export const protectedProcedure = o.use(requireAuth)
