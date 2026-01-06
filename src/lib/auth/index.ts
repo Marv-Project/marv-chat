@@ -44,6 +44,18 @@ export const auth = betterAuth({
     usernamePlugin(),
     tanstackStartCookies(),
   ],
+  socialProviders: {
+    github: {
+      enabled: true,
+      clientId: env.GITHUB_CLIENT_ID,
+      clientSecret: env.GITHUB_CLIENT_SECRET,
+    },
+    google: {
+      enabled: true,
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+    },
+  },
   secret: env.BETTER_AUTH_SECRET,
   session: {
     expiresIn: 60 * 60 * 24 * 3,
