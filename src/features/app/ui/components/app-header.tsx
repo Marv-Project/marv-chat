@@ -15,62 +15,124 @@ import {
 import { useSidebar } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 
-export const AppHeader = () => {
+/**
+ * Reusable sidebar toggle button that handles the expand/collapse logic
+ */
+const SidebarToggleButton = () => {
   const { state, toggleSidebar, isMobile } = useSidebar()
+  const isCollapsedOrMobile = state === 'collapsed' || isMobile
 
   return (
-    <header className="sticky top-0 z-50 mt-2 flex h-11 w-full items-center justify-between rounded-md">
-      <div
-        className={cn(
-          'bg-sidebar/65 supports-backdrop-filter:bg-sidebar/65 border-sidebar-border rounded-md border p-1 backdrop-blur-sm transition-all ease-in-out',
-          (state === 'collapsed' || isMobile) && 'ml-2',
-        )}
-      >
+    <Button
+      type="button"
+      variant="ghost"
+      size="icon-sm"
+      onClick={toggleSidebar}
+      aria-label={isCollapsedOrMobile ? 'Expand sidebar' : 'Collapse sidebar'}
+    >
+      {isCollapsedOrMobile ? <PanelLeftIcon /> : <PanelLeftCloseIcon />}
+    </Button>
+  )
+}
+
+/**
+ * Reusable search button that appears when sidebar is collapsed/mobile
+ */
+const SearchButton = () => {
+  const { state, isMobile } = useSidebar()
+  const isCollapsedOrMobile = state === 'collapsed' || isMobile
+
+  return (
+    <Activity mode={isCollapsedOrMobile ? 'visible' : 'hidden'}>
+      <Button type="button" variant="ghost" size="icon-sm" aria-label="Search">
+        <SearchIcon />
+      </Button>
+    </Activity>
+  )
+}
+
+/**
+ * Reusable header section wrapper with backdrop blur styling
+ */
+const HeaderSection = ({
+  children,
+  className,
+  applyMarginOnCollapsed = false,
+  applyBackdropOnlyWhenCollapsed = false,
+}: {
+  children: React.ReactNode
+  className?: string
+  applyMarginOnCollapsed?: boolean
+  applyBackdropOnlyWhenCollapsed?: boolean
+}) => {
+  const { state, isMobile } = useSidebar()
+  const isCollapsedOrMobile = state === 'collapsed' || isMobile
+
+  const baseStyles = 'p-1 transition-all ease-in-out'
+  const backdropStyles =
+    'bg-sidebar/65 supports-backdrop-filter:bg-sidebar/65 border-sidebar-border rounded-md border backdrop-blur-sm'
+
+  return (
+    <div
+      className={cn(
+        baseStyles,
+        applyBackdropOnlyWhenCollapsed
+          ? isCollapsedOrMobile && backdropStyles
+          : backdropStyles,
+        applyMarginOnCollapsed && isCollapsedOrMobile && 'ml-2',
+        className,
+      )}
+    >
+      {children}
+    </div>
+  )
+}
+
+/**
+ * Settings dropdown menu with theme toggle
+ */
+const SettingsDropdown = () => {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
         <Button
           type="button"
           variant="ghost"
           size="icon-sm"
-          onClick={toggleSidebar}
+          aria-label="Settings"
         >
-          {state === 'collapsed' || isMobile ? (
-            <PanelLeftIcon />
-          ) : (
-            <PanelLeftCloseIcon />
-          )}
+          <SettingsIcon />
         </Button>
+      </DropdownMenuTrigger>
 
-        <Activity
-          mode={state === 'collapsed' || isMobile ? 'visible' : 'hidden'}
-        >
-          <Button type="button" variant="ghost" size="icon-sm">
-            <SearchIcon />
-          </Button>
-        </Activity>
-      </div>
+      <DropdownMenuContent
+        align="end"
+        sideOffset={10}
+        className="w-(--radix-dropdown-menu-trigger-width) min-w-44 p-2"
+      >
+        <ThemeModeToggle />
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
 
-      <div className="bg-sidebar/65 supports-backdrop-filter:bg-sidebar/65 border-sidebar-border mr-2 rounded-md border p-1 backdrop-blur-sm">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="button" variant="ghost" size="icon-sm">
-              <SettingsIcon />
-            </Button>
-          </DropdownMenuTrigger>
+export const AppHeader = () => {
+  return (
+    <header className="sticky top-0 z-50 mt-2 flex h-11 w-full items-center justify-between rounded-md">
+      <HeaderSection applyMarginOnCollapsed>
+        <SidebarToggleButton />
+        <SearchButton />
+      </HeaderSection>
 
-          <DropdownMenuContent
-            align="end"
-            sideOffset={10}
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-44 p-2"
-          >
-            <ThemeModeToggle />
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <HeaderSection className="mr-2">
+        <SettingsDropdown />
+      </HeaderSection>
     </header>
   )
 }
 
 export const AppLeftNavHeader = () => {
-  const { state, toggleSidebar, isMobile } = useSidebar()
+  const { isMobile } = useSidebar()
 
   return (
     <nav
@@ -80,39 +142,15 @@ export const AppLeftNavHeader = () => {
         isMobile && 'px-2 pt-0',
       )}
     >
-      <div
-        className={cn(
-          'p-1 transition-all ease-in-out',
-          (state === 'collapsed' || isMobile) &&
-            'bg-sidebar/65 supports-backdrop-filter:bg-sidebar/65 border-sidebar-border rounded-md border backdrop-blur-sm',
-        )}
-      >
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          onClick={toggleSidebar}
-        >
-          {state === 'collapsed' || isMobile ? (
-            <PanelLeftIcon />
-          ) : (
-            <PanelLeftCloseIcon />
-          )}
-        </Button>
-
-        <Activity
-          mode={state === 'collapsed' || isMobile ? 'visible' : 'hidden'}
-        >
-          <Button type="button" variant="ghost" size="icon-sm">
-            <SearchIcon />
-          </Button>
-        </Activity>
-      </div>
+      <HeaderSection applyBackdropOnlyWhenCollapsed>
+        <SidebarToggleButton />
+        <SearchButton />
+      </HeaderSection>
     </nav>
   )
 }
 
-export const AppRigthtNavHeader = () => {
+export const AppRightNavHeader = () => {
   const { isMobile } = useSidebar()
 
   return (
@@ -123,23 +161,14 @@ export const AppRigthtNavHeader = () => {
         isMobile && 'px-2 pt-0',
       )}
     >
-      <div className="bg-sidebar/65 supports-backdrop-filter:bg-sidebar/65 border-sidebar-border rounded-md border p-1 backdrop-blur-sm">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button type="button" variant="ghost" size="icon-sm">
-              <SettingsIcon />
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent
-            align="end"
-            sideOffset={10}
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-44 p-2"
-          >
-            <ThemeModeToggle />
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+      <HeaderSection>
+        <SettingsDropdown />
+      </HeaderSection>
     </nav>
   )
 }
+
+/**
+ * @deprecated Use AppRightNavHeader instead (fixes typo)
+ */
+export const AppRigthtNavHeader = AppRightNavHeader
