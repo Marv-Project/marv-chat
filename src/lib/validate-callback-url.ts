@@ -46,10 +46,12 @@ export function validateCallbackUrl(callbackURL: string | undefined): string {
     // e.g., "/\evil.com" or path traversal attempts
     try {
       // Normalize the path to catch any sneaky patterns
-      const normalized = new URL(trimmedUrl, 'http://localhost').pathname
+      const parsedUrl = new URL(trimmedUrl, 'http://localhost')
+      const normalized = parsedUrl.pathname
       // Ensure the path still starts with /
       if (normalized.startsWith('/')) {
-        return trimmedUrl
+        // Return sanitized path components to remove any traversal/backslash tricks
+        return normalized + parsedUrl.search + parsedUrl.hash
       }
       return DEFAULT_FALLBACK_PATH
     } catch {
