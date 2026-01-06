@@ -1,5 +1,5 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
-import { getAuthFn } from '@/functions/get-auht-fn'
+import { getAuthFn } from '@/functions/get-auth-fn'
 
 export const Route = createFileRoute('/_app')({
   component: App,

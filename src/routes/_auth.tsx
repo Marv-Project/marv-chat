@@ -1,6 +1,7 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 import { loginRouterValidator } from '@/schemas/router.schema'
-import { getAuthFn } from '@/functions/get-auht-fn'
+import { getAuthFn } from '@/functions/get-auth-fn'
+import { validateCallbackUrl } from '@/lib/validate-callback-url'
 
 export const Route = createFileRoute('/_auth')({
   component: Auth,
@@ -11,8 +12,10 @@ export const Route = createFileRoute('/_auth')({
   },
   loader: ({ context }) => {
     if (context.auth) {
+      const safeCallbackUrl = validateCallbackUrl(context.search.callbackURL)
+
       throw redirect({
-        to: context.search.callbackURL,
+        to: safeCallbackUrl,
         viewTransition: true,
       })
     }
