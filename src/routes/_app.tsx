@@ -1,4 +1,7 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { AppHeader } from '@/features/app/ui/components/app-header'
+import { AppSidebar } from '@/features/app/ui/components/app-sidebar'
 import { getAuthFn } from '@/functions/get-auth-fn'
 
 export const Route = createFileRoute('/_app')({
@@ -21,8 +24,19 @@ export const Route = createFileRoute('/_app')({
 
 function App() {
   return (
-    <>
-      <Outlet />
-    </>
+    <SidebarProvider
+      style={
+        {
+          '--sidebar-width': 'calc(var(--spacing) * 72)',
+          '--header-height': 'calc(var(--spacing) * 12)',
+        } as React.CSSProperties
+      }
+    >
+      <AppSidebar variant="floating" />
+      <SidebarInset>
+        <AppHeader />
+        <Outlet />
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
