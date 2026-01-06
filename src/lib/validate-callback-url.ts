@@ -51,11 +51,11 @@ export function validateCallbackUrl(callbackURL: string | undefined): string {
       if (normalized.startsWith('/')) {
         return trimmedUrl
       }
+      return DEFAULT_FALLBACK_PATH
     } catch {
       // If parsing fails, return default
       return DEFAULT_FALLBACK_PATH
     }
-    return trimmedUrl
   }
 
   // For absolute URLs, validate against trusted origins
