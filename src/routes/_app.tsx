@@ -1,4 +1,9 @@
-import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import {
+  Outlet,
+  createFileRoute,
+  redirect,
+  useParams,
+} from '@tanstack/react-router'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { AppHeader } from '@/features/app/ui/components/app-header'
 import { AppSidebar } from '@/features/app/ui/components/app-sidebar'
@@ -23,6 +28,9 @@ export const Route = createFileRoute('/_app')({
 })
 
 function App() {
+  const params = useParams({ strict: false })
+  const chatId = params.chatId
+
   return (
     <SidebarProvider
       style={
@@ -32,7 +40,7 @@ function App() {
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant="floating" />
+      <AppSidebar variant="floating" activeChatId={chatId} />
       <SidebarInset>
         <AppHeader />
         <Outlet />

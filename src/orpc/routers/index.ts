@@ -3,12 +3,18 @@ import type {
   InferRouterOutputs,
   RouterClient,
 } from '@orpc/server'
-import { publicProcedure } from '@/orpc'
+import { getAllMessages } from '@/orpc/routers/message'
+import { deleteChat, getAllChat } from '@/orpc/routers/chat'
 
 export const orpcRouter = {
-  healthCheck: publicProcedure.handler(() => {
-    return 'OK'
-  }),
+  chats: {
+    getAll: getAllChat,
+    delete: deleteChat,
+  },
+
+  messages: {
+    getAll: getAllMessages,
+  },
 }
 
 export type ORPCRouterClient = RouterClient<typeof orpcRouter>

@@ -13,6 +13,8 @@ export const env = createEnv({
     GITHUB_CLIENT_SECRET: z.string(),
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
+    OPENROUTER_API_KEY: z.string(),
+    OLLAMA_API_KEY: z.string(),
   },
 
   /**

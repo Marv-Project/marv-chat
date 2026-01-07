@@ -13,8 +13,11 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
+import { Route as AppChatRouteImport } from './routes/_app/chat'
 import { Route as ApiOrpcSplatRouteImport } from './routes/api/orpc.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
+import { Route as ApiAiSplatRouteImport } from './routes/api/ai.$'
+import { Route as AppChatChatIdRouteImport } from './routes/_app/chat.$chatId'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
@@ -34,6 +37,11 @@ const AuthLoginRoute = AuthLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
+const AppChatRoute = AppChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => AppRoute,
+} as any)
 const ApiOrpcSplatRoute = ApiOrpcSplatRouteImport.update({
   id: '/api/orpc/$',
   path: '/api/orpc/$',
@@ -44,16 +52,32 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAiSplatRoute = ApiAiSplatRouteImport.update({
+  id: '/api/ai/$',
+  path: '/api/ai/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppChatChatIdRoute = AppChatChatIdRouteImport.update({
+  id: '/$chatId',
+  path: '/$chatId',
+  getParentRoute: () => AppChatRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
+  '/chat': typeof AppChatRouteWithChildren
   '/login': typeof AuthLoginRoute
   '/': typeof AppIndexRoute
+  '/chat/$chatId': typeof AppChatChatIdRoute
+  '/api/ai/$': typeof ApiAiSplatRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/orpc/$': typeof ApiOrpcSplatRoute
 }
 export interface FileRoutesByTo {
+  '/chat': typeof AppChatRouteWithChildren
   '/login': typeof AuthLoginRoute
   '/': typeof AppIndexRoute
+  '/chat/$chatId': typeof AppChatChatIdRoute
+  '/api/ai/$': typeof ApiAiSplatRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/orpc/$': typeof ApiOrpcSplatRoute
 }
@@ -61,22 +85,42 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
+  '/_app/chat': typeof AppChatRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/chat/$chatId': typeof AppChatChatIdRoute
+  '/api/ai/$': typeof ApiAiSplatRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/orpc/$': typeof ApiOrpcSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/login' | '/' | '/api/auth/$' | '/api/orpc/$'
+  fullPaths:
+    | '/chat'
+    | '/login'
+    | '/'
+    | '/chat/$chatId'
+    | '/api/ai/$'
+    | '/api/auth/$'
+    | '/api/orpc/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/' | '/api/auth/$' | '/api/orpc/$'
+  to:
+    | '/chat'
+    | '/login'
+    | '/'
+    | '/chat/$chatId'
+    | '/api/ai/$'
+    | '/api/auth/$'
+    | '/api/orpc/$'
   id:
     | '__root__'
     | '/_app'
     | '/_auth'
+    | '/_app/chat'
     | '/_auth/login'
     | '/_app/'
+    | '/_app/chat/$chatId'
+    | '/api/ai/$'
     | '/api/auth/$'
     | '/api/orpc/$'
   fileRoutesById: FileRoutesById
@@ -84,6 +128,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  ApiAiSplatRoute: typeof ApiAiSplatRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiOrpcSplatRoute: typeof ApiOrpcSplatRoute
 }
@@ -118,6 +163,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_app/chat': {
+      id: '/_app/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof AppChatRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/api/orpc/$': {
       id: '/api/orpc/$'
       path: '/api/orpc/$'
@@ -132,14 +184,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ai/$': {
+      id: '/api/ai/$'
+      path: '/api/ai/$'
+      fullPath: '/api/ai/$'
+      preLoaderRoute: typeof ApiAiSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/chat/$chatId': {
+      id: '/_app/chat/$chatId'
+      path: '/$chatId'
+      fullPath: '/chat/$chatId'
+      preLoaderRoute: typeof AppChatChatIdRouteImport
+      parentRoute: typeof AppChatRoute
+    }
   }
 }
 
+interface AppChatRouteChildren {
+  AppChatChatIdRoute: typeof AppChatChatIdRoute
+}
+
+const AppChatRouteChildren: AppChatRouteChildren = {
+  AppChatChatIdRoute: AppChatChatIdRoute,
+}
+
+const AppChatRouteWithChildren =
+  AppChatRoute._addFileChildren(AppChatRouteChildren)
+
 interface AppRouteChildren {
+  AppChatRoute: typeof AppChatRouteWithChildren
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppChatRoute: AppChatRouteWithChildren,
   AppIndexRoute: AppIndexRoute,
 }
 
@@ -158,6 +237,7 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  ApiAiSplatRoute: ApiAiSplatRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiOrpcSplatRoute: ApiOrpcSplatRoute,
 }

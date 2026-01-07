@@ -167,8 +167,3 @@ export const AppRightNavHeader = () => {
     </nav>
   )
 }
-
-/**
- * @deprecated Use AppRightNavHeader instead (fixes typo)
- */
-export const AppRigthtNavHeader = AppRightNavHeader
