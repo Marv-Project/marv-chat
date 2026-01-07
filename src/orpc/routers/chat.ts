@@ -4,7 +4,7 @@ import { protectedProcedure } from '@/orpc'
 export const getAllChat = protectedProcedure.handler(async ({ context }) => {
   const chats = await context.prisma.chat.findMany({
     where: { userId: context.auth.user.id },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { updatedAt: 'desc' },
   })
 
   return chats
