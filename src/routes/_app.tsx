@@ -5,8 +5,8 @@ import {
   useParams,
 } from '@tanstack/react-router'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import { AppHeader } from '@/features/app/ui/components/app-header'
 import { AppSidebar } from '@/features/app/ui/components/app-sidebar'
+import { AppHeader } from '@/features/app/ui/components/app-header'
 import { getAuthFn } from '@/functions/get-auth-fn'
 
 export const Route = createFileRoute('/_app')({
@@ -32,19 +32,14 @@ function App() {
   const chatId = params.chatId
 
   return (
-    <SidebarProvider
-      style={
-        {
-          '--sidebar-width': 'calc(var(--spacing) * 72)',
-          '--header-height': 'calc(var(--spacing) * 12)',
-        } as React.CSSProperties
-      }
-    >
-      <AppSidebar variant="floating" activeChatId={chatId} />
-      <SidebarInset>
-        <AppHeader />
-        <Outlet />
-      </SidebarInset>
-    </SidebarProvider>
+    <div className="h-svh w-full overflow-hidden">
+      <SidebarProvider>
+        <AppSidebar variant="inset" activeChatId={chatId} />
+        <SidebarInset className="h-[calc(100svh-1rem)] overflow-hidden max-md:h-svh">
+          {/* <AppHeader /> */}
+          <Outlet />
+        </SidebarInset>
+      </SidebarProvider>
+    </div>
   )
 }
