@@ -1,8 +1,8 @@
 import { generateText } from 'ai'
-import type { UIMessage } from 'ai'
 import type { AppUIMessage } from '@/lib/ai-sdk/types'
+import type { UIMessage } from 'ai'
 import { prisma } from '@/configs/prisma'
-import { ollama } from '@/lib/ai-sdk/registry'
+import { openrouter } from '@/lib/ai-sdk/registry'
 
 export const getChatById = async (id: string) => {
   return prisma.chat.findUnique({
@@ -47,7 +47,7 @@ export const loadMessages = async (id: string): Promise<AppUIMessage[]> => {
 export const generateTitle = async (message: UIMessage) => {
   try {
     const { text } = await generateText({
-      model: ollama('gemini-3-flash-preview'),
+      model: openrouter('deepseek/deepseek-r1-0528:free'),
       system: `\n
                   - you will generate a short title based on the first message a user begins a conversation with
                   - ensure it is not more than 80 characters long

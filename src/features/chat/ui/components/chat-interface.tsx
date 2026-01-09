@@ -1,7 +1,8 @@
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
-import { CopyIcon, GlobeIcon, Loader, RefreshCcwIcon } from 'lucide-react'
+import { CopyIcon, GlobeIcon, RefreshCcwIcon } from 'lucide-react'
 import { useState } from 'react'
+import { v4 as uuidV4 } from 'uuid'
 import type { PromptInputMessage } from '@/components/ai-elements/prompt-input'
 import type { AppUIMessage } from '@/lib/ai-sdk/types'
 import {
@@ -40,18 +41,20 @@ import {
   SourcesContent,
   SourcesTrigger,
 } from '@/components/ai-elements/sources'
+import { Loader } from '@/components/ai-elements/loader'
 
 interface ChatLayoutProps {
-  id: string
+  chatId: string
   initialMessages?: AppUIMessage[]
 }
 
-export const ChatInterface = ({ id, initialMessages }: ChatLayoutProps) => {
+export const ChatInterface = ({ chatId, initialMessages }: ChatLayoutProps) => {
   const [input, setInput] = useState('')
 
   const { messages, sendMessage, status, regenerate } = useChat({
-    id,
+    id: chatId,
     messages: initialMessages,
+    generateId: () => uuidV4(),
     transport: new DefaultChatTransport({
       api: '/api/ai',
       prepareSendMessagesRequest: ({

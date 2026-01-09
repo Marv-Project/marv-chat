@@ -53,7 +53,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="selection:bg-primary selection:text-primary-foreground">
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
           {children}
           <Toaster position="top-center" richColors />

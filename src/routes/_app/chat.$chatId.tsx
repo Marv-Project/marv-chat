@@ -15,5 +15,7 @@ function RouteComponent() {
   const params = Route.useParams()
   const { data: initialMessages } = useMessages(params.chatId)
 
-  return <ChatInterface id={params.chatId} initialMessages={initialMessages} />
+  return (
+    <ChatInterface chatId={params.chatId} initialMessages={initialMessages} />
+  )
 }

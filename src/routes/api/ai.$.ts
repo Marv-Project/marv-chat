@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 import type { AppUIMessage } from '@/lib/ai-sdk/types'
 import { authMiddleware } from '@/middlewares/auth'
 import { createChat, generateTitle, getChatById, loadMessages } from '@/utils'
-import { ollama } from '@/lib/ai-sdk/registry'
+import { openrouter } from '@/lib/ai-sdk/registry'
 import { prisma } from '@/configs/prisma'
 
 export const Route = createFileRoute('/api/ai/$')({
@@ -39,7 +39,7 @@ export const Route = createFileRoute('/api/ai/$')({
         })
 
         const result = streamText({
-          model: ollama('gemini-3-flash-preview'),
+          model: openrouter('deepseek/deepseek-r1-0528:free'),
           messages: await convertToModelMessages(validatedMessages),
           onError: (error) => {
             console.log('Streaming error', error)
@@ -54,7 +54,7 @@ export const Route = createFileRoute('/api/ai/$')({
             if (part.type === 'start') {
               return {
                 createdAt: Date.now(),
-                model: 'gemini-3-flash-preview',
+                model: 'deepseek/deepseek-r1-0528:free',
               }
             }
             if (part.type === 'finish') {
