@@ -7,7 +7,7 @@ import type { AppUIMessage } from '@/lib/ai-sdk/types'
 import {
   Conversation,
   ConversationContent,
-  ConversationScrollButton,
+  ConversationScrollButtonWithText,
 } from '@/components/ai-elements/conversation'
 import {
   Message,
@@ -123,25 +123,24 @@ export const ChatInterface = ({ id, initialMessages }: ChatLayoutProps) => {
                           <MessageContent>
                             <MessageResponse>{part.text}</MessageResponse>
                           </MessageContent>
-                          {message.role === 'assistant' &&
-                            i === messages.length - 1 && (
-                              <MessageActions>
-                                <MessageAction
-                                  onClick={() => regenerate()}
-                                  label="Retry"
-                                >
-                                  <RefreshCcwIcon className="size-3" />
-                                </MessageAction>
-                                <MessageAction
-                                  onClick={() =>
-                                    navigator.clipboard.writeText(part.text)
-                                  }
-                                  label="Copy"
-                                >
-                                  <CopyIcon className="size-3" />
-                                </MessageAction>
-                              </MessageActions>
-                            )}
+                          {message.role === 'assistant' && (
+                            <MessageActions>
+                              <MessageAction
+                                onClick={() => regenerate()}
+                                label="Retry"
+                              >
+                                <RefreshCcwIcon className="size-3" />
+                              </MessageAction>
+                              <MessageAction
+                                onClick={() =>
+                                  navigator.clipboard.writeText(part.text)
+                                }
+                                label="Copy"
+                              >
+                                <CopyIcon className="size-3" />
+                              </MessageAction>
+                            </MessageActions>
+                          )}
                         </Message>
                       )
                     case 'reasoning':
@@ -165,7 +164,9 @@ export const ChatInterface = ({ id, initialMessages }: ChatLayoutProps) => {
                 })}
               </div>
             ))}
-            {status === 'submitted' && <Loader />}
+
+            {status === 'submitted' || (status === 'streaming' && <Loader />)}
+
             <div className="bg-sidebar/65 supports-backdrop-filter:bg-sidebar/65 sticky bottom-4 z-10 mt-auto w-full rounded-md backdrop-blur-sm">
               <PromptInput onSubmit={handleSubmit} globalDrop multiple>
                 <PromptInputBody>
@@ -195,7 +196,7 @@ export const ChatInterface = ({ id, initialMessages }: ChatLayoutProps) => {
               </PromptInput>
             </div>
           </ConversationContent>
-          <ConversationScrollButton className="bottom-32" />
+          <ConversationScrollButtonWithText className="bottom-36" />
         </Conversation>
       </div>
     </div>

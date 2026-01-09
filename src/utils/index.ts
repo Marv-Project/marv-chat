@@ -47,7 +47,7 @@ export const loadMessages = async (id: string): Promise<AppUIMessage[]> => {
 export const generateTitle = async (message: UIMessage) => {
   try {
     const { text } = await generateText({
-      model: ollama('gpt-oss:120b'),
+      model: ollama('gemini-3-flash-preview'),
       system: `\n
                   - you will generate a short title based on the first message a user begins a conversation with
                   - ensure it is not more than 80 characters long

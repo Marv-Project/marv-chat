@@ -39,7 +39,7 @@ export const Route = createFileRoute('/api/ai/$')({
         })
 
         const result = streamText({
-          model: ollama('gpt-oss:120b'),
+          model: ollama('gemini-3-flash-preview'),
           messages: await convertToModelMessages(validatedMessages),
           onError: (error) => {
             console.log('Streaming error', error)
@@ -54,7 +54,7 @@ export const Route = createFileRoute('/api/ai/$')({
             if (part.type === 'start') {
               return {
                 createdAt: Date.now(),
-                model: 'gpt-oss:120b',
+                model: 'gemini-3-flash-preview',
               }
             }
             if (part.type === 'finish') {

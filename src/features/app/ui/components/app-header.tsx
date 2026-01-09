@@ -68,9 +68,9 @@ const HeaderSection = ({
   const { state, isMobile } = useSidebar()
   const isCollapsedOrMobile = state === 'collapsed' || isMobile
 
-  const baseStyles = 'p-1 transition-all ease-in-out'
+  const baseStyles = 'p-0.5 transition-all ease-in-out'
   const backdropStyles =
-    'bg-sidebar/65 supports-backdrop-filter:bg-sidebar/65 border-sidebar-border rounded-md border backdrop-blur-sm'
+    'bg-sidebar/65 supports-backdrop-filter:bg-sidebar/65 border-sidebar-border rounded-md border backdrop-blur-sm max-md:mt-2'
 
   return (
     <div
@@ -113,21 +113,6 @@ const SettingsDropdown = () => {
         <ThemeModeToggle />
       </DropdownMenuContent>
     </DropdownMenu>
-  )
-}
-
-export const AppHeader = () => {
-  return (
-    <header className="sticky top-0 z-50 mt-2 flex h-11 w-full items-center justify-between rounded-md">
-      <HeaderSection applyMarginOnCollapsed>
-        <SidebarToggleButton />
-        <SearchButton />
-      </HeaderSection>
-
-      <HeaderSection className="mr-2">
-        <SettingsDropdown />
-      </HeaderSection>
-    </header>
   )
 }
 

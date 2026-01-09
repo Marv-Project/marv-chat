@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label'
 
 export const AppSidebarHeader = () => {
   return (
-    <SidebarHeader>
+    <SidebarHeader className="mt-1">
       <SidebarMenu>
         <SidebarMenuItem>
           <SidebarMenuButton
