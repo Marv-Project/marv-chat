@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ORPCError } from '@orpc/client'
+import { ORPCError } from '@orpc/server'
 import type { AppUIMessage } from '@/lib/ai-sdk/types'
 import { protectedProcedure } from '@/orpc'
 import { generateTitle } from '@/utils'
@@ -32,6 +32,8 @@ export const generateTitleProcedure = protectedProcedure
   )
   .handler(async ({ context, input }) => {
     const { chatId, message } = input
+
+    console.log('ORPC generateTitleProcedure:', { chatId, message })
 
     // Verify chat exists and belongs to authenticated user
     const existingChat = await context.prisma.chat.findFirst({

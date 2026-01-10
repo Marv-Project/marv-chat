@@ -62,6 +62,8 @@ export const ChatInterface = ({
 }: ChatLayoutProps) => {
   const [input, setInput] = useState('')
   const hasAutoSent = useRef(false)
+  const hasTitleGenerated = useRef(false)
+  const firstUserMessageRef = useRef<AppUIMessage | null>(null)
   const { mutate: generateTitle } = useGenerateTitle()
 
   const { messages, sendMessage, status, regenerate } = useChat({
@@ -84,47 +86,52 @@ export const ChatInterface = ({
         }
       },
     }),
+    onFinish: () => {
+      // Generate title only once (on first message completion)
+      if (chatId && !hasTitleGenerated.current && firstUserMessageRef.current) {
+        hasTitleGenerated.current = true
+        generateTitle(
+          { chatId, message: firstUserMessageRef.current },
+          {
+            onError: (error) => {
+              console.error('Failed to generate title:', error)
+              hasTitleGenerated.current = false // Allow retry
+            },
+          },
+        )
+      }
+    },
   })
 
   // Auto-send initial prompt from navigation state (when redirected from index)
-  // Also trigger title generation in parallel - no latency for streaming response
   useEffect(() => {
     if (initialPrompt && chatId && !hasAutoSent.current) {
-      hasAutoSent.current = true
-
-      const promptText = initialPrompt.text || ''
+      const promptText = initialPrompt.text.trim()
+      const hasFiles = initialPrompt.files.length > 0
+      const textForSend =
+        promptText || (hasFiles ? 'Sent with attachments' : '')
 
       // Skip if no content to send
-      if (!promptText && !initialPrompt.files.length) {
-        return
-      }
+      if (!textForSend && !hasFiles) return
 
-      // Create the user message for title generation
-      const userMessage: AppUIMessage = {
+      hasAutoSent.current = true
+
+      // Store first user message for title generation (used in onFinish)
+      firstUserMessageRef.current = {
         id: uuidV4(),
         role: 'user',
-        parts: [{ type: 'text', text: promptText }],
+        parts: [{ type: 'text', text: textForSend }],
       }
 
-      // Fire both in parallel - streaming response + title generation
+      // Send message - title generation happens in onFinish after chat is created
       void sendMessage({
-        text: promptText,
+        text: textForSend,
         files: initialPrompt.files,
       })
 
-      // Generate title in background (doesn't block streaming)
-      generateTitle(
-        { chatId, message: userMessage },
-        {
-          onError: (error) => {
-            console.error('Failed to generate title:', error)
-          },
-        },
-      )
-
       onInitialPromptSent?.()
     }
-  }, [initialPrompt, chatId, sendMessage, onInitialPromptSent, generateTitle])
+  }, [initialPrompt, chatId, sendMessage, onInitialPromptSent])
 
   const handleSubmit = (message: PromptInputMessage) => {
     const hasText = Boolean(message.text)
