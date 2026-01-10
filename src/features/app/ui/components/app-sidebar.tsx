@@ -11,7 +11,7 @@ export const AppSidebar = ({
   const chats = useChats()
 
   return (
-    <Sidebar collapsible="offExamples" {...props}>
+    <Sidebar {...props}>
       <AppSidebarHeader />
 
       <AppSidebarContent items={chats.data} activeChatId={activeChatId} />

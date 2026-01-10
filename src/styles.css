@@ -136,12 +136,6 @@
     scrollbar-color: theme(colors.border) transparent;
   }
 
-  /* Webkit scrollbar styling */
-  ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-  }
-
   ::-webkit-scrollbar-track {
     background: transparent;
   }

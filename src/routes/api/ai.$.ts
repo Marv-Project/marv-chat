@@ -1,5 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { convertToModelMessages, streamText, validateUIMessages } from 'ai'
+import {
+  convertToModelMessages,
+  smoothStream,
+  streamText,
+  validateUIMessages,
+} from 'ai'
 import { v4 as uuidv4 } from 'uuid'
 import type { AppUIMessage } from '@/lib/ai-sdk/types'
 import { authMiddleware } from '@/middlewares/auth'
@@ -44,6 +49,10 @@ export const Route = createFileRoute('/api/ai/$')({
           onError: (error) => {
             console.log('Streaming error', error)
           },
+          experimental_transform: smoothStream({
+            delayInMs: 20, // optional: defaults to 10ms
+            chunking: 'line', // optional: defaults to 'word'
+          }),
         })
 
         return result.toUIMessageStreamResponse({
