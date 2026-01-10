@@ -92,30 +92,25 @@ export const ChatInterface = ({ chatId, initialMessages }: ChatLayoutProps) => {
     <div className="relative flex h-svh min-w-0 flex-col overflow-x-hidden">
       <Conversation>
         <ConversationContent className="mx-auto h-auto w-full max-w-3xl px-6 pt-20 pb-40!">
-          {messages.map((message) => (
-            <div key={message.id}>
-              {message.role === 'assistant' &&
-                message.parts.filter((part) => part.type === 'source-url')
-                  .length > 0 && (
+          {messages.map((message) => {
+            const sources = message.parts.filter(
+              (part) => part.type === 'source-url',
+            )
+
+            return (
+              <div key={message.id}>
+                {message.role === 'assistant' && sources.length > 0 && (
                   <Sources>
-                    <SourcesTrigger
-                      count={
-                        message.parts.filter(
-                          (part) => part.type === 'source-url',
-                        ).length
-                      }
-                    />
-                    {message.parts
-                      .filter((part) => part.type === 'source-url')
-                      .map((part, i) => (
-                        <SourcesContent key={`${message.id}-${i}`}>
-                          <Source
-                            key={`${message.id}-${i}`}
-                            href={part.url}
-                            title={part.url}
-                          />
-                        </SourcesContent>
+                    <SourcesTrigger count={sources.length} />
+                    <SourcesContent>
+                      {sources.map((source, i) => (
+                        <Source
+                          key={`${message.id}-${i}`}
+                          href={source.url}
+                          title={source.url}
+                        />
                       ))}
+                    </SourcesContent>
                   </Sources>
                 )}
               {message.parts.map((part, i) => {
@@ -171,8 +166,9 @@ export const ChatInterface = ({ chatId, initialMessages }: ChatLayoutProps) => {
                     return null
                 }
               })}
-            </div>
-          ))}
+              </div>
+            )
+          })}
 
           {status === 'submitted' || (status === 'streaming' && <Loader />)}
         </ConversationContent>
