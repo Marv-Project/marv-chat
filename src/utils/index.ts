@@ -1,6 +1,5 @@
 import { generateText } from 'ai'
 import type { AppUIMessage } from '@/lib/ai-sdk/types'
-import type { UIMessage } from 'ai'
 import { prisma } from '@/configs/prisma'
 import { openrouter } from '@/lib/ai-sdk/registry'
 
@@ -44,7 +43,7 @@ export const loadMessages = async (id: string): Promise<AppUIMessage[]> => {
   })
 }
 
-export const generateTitle = async (message: UIMessage) => {
+export const generateTitle = async (message: AppUIMessage) => {
   try {
     const { text } = await generateText({
       model: openrouter('deepseek/deepseek-r1-0528:free'),

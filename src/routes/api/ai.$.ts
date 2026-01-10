@@ -7,10 +7,10 @@ import {
 } from 'ai'
 import { v4 as uuidv4 } from 'uuid'
 import type { AppUIMessage } from '@/lib/ai-sdk/types'
-import { authMiddleware } from '@/middlewares/auth'
-import { createChat, generateTitle, getChatById, loadMessages } from '@/utils'
-import { openrouter } from '@/lib/ai-sdk/registry'
 import { prisma } from '@/configs/prisma'
+import { openrouter } from '@/lib/ai-sdk/registry'
+import { authMiddleware } from '@/middlewares/auth'
+import { createChat, getChatById, loadMessages } from '@/utils'
 
 export const Route = createFileRoute('/api/ai/$')({
   server: {
@@ -28,11 +28,7 @@ export const Route = createFileRoute('/api/ai/$')({
 
         let chat = await getChatById(id)
 
-        if (!chat) {
-          const title = await generateTitle(message)
-
-          chat = await createChat(id, title, context.auth.user.id)
-        }
+        chat ??= await createChat(id, 'New Chat', context.auth.user.id)
 
         // Load previous messages from database
         const previousMessages = await loadMessages(id)
@@ -74,6 +70,7 @@ export const Route = createFileRoute('/api/ai/$')({
           },
           onFinish: async ({ messages: onFinishMessages, responseMessage }) => {
             console.log('complete message', responseMessage)
+
             try {
               await prisma.message.createMany({
                 data: onFinishMessages.map((m: AppUIMessage) => ({

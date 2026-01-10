@@ -1,10 +1,11 @@
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import { CopyIcon, GlobeIcon, RefreshCcwIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { v4 as uuidV4 } from 'uuid'
 import type { PromptInputMessage } from '@/components/ai-elements/prompt-input'
 import type { AppUIMessage } from '@/lib/ai-sdk/types'
+import { useGenerateTitle } from '@/hooks/chat/use-generate-title'
 import {
   Conversation,
   ConversationContent,
@@ -45,12 +46,23 @@ import { Loader } from '@/components/ai-elements/loader'
 import { cn } from '@/lib/utils'
 
 interface ChatLayoutProps {
-  chatId: string
+  chatId?: string
   initialMessages?: AppUIMessage[]
+  onFirstPrompt?: (message: PromptInputMessage) => void
+  initialPrompt?: PromptInputMessage
+  onInitialPromptSent?: () => void
 }
 
-export const ChatInterface = ({ chatId, initialMessages }: ChatLayoutProps) => {
+export const ChatInterface = ({
+  chatId,
+  initialMessages = [],
+  onFirstPrompt,
+  initialPrompt,
+  onInitialPromptSent,
+}: ChatLayoutProps) => {
   const [input, setInput] = useState('')
+  const hasAutoSent = useRef(false)
+  const { mutate: generateTitle } = useGenerateTitle()
 
   const { messages, sendMessage, status, regenerate } = useChat({
     id: chatId,
@@ -74,11 +86,43 @@ export const ChatInterface = ({ chatId, initialMessages }: ChatLayoutProps) => {
     }),
   })
 
+  // Auto-send initial prompt from navigation state (when redirected from index)
+  // Also trigger title generation in parallel - no latency for streaming response
+  useEffect(() => {
+    if (initialPrompt && chatId && !hasAutoSent.current) {
+      hasAutoSent.current = true
+
+      // Create the user message for title generation
+      const userMessage: AppUIMessage = {
+        id: uuidV4(),
+        role: 'user',
+        parts: [{ type: 'text', text: initialPrompt.text || input }],
+      }
+
+      // Fire both in parallel - streaming response + title generation
+      void sendMessage({
+        text: initialPrompt.text || input,
+        files: initialPrompt.files,
+      })
+
+      // Generate title in background (doesn't block streaming)
+      generateTitle({ chatId, message: userMessage })
+
+      onInitialPromptSent?.()
+    }
+  }, [initialPrompt, chatId, sendMessage, onInitialPromptSent, generateTitle])
+
   const handleSubmit = (message: PromptInputMessage) => {
     const hasText = Boolean(message.text)
     const hasAttachments = Boolean(message.files.length)
 
     if (!(hasText || hasAttachments)) return
+
+    // If on index page (no chatId), delegate to parent for navigation
+    if (onFirstPrompt) {
+      onFirstPrompt(message)
+      return
+    }
 
     void sendMessage({
       text: message.text || 'Sent with attachments',
@@ -113,59 +157,59 @@ export const ChatInterface = ({ chatId, initialMessages }: ChatLayoutProps) => {
                     </SourcesContent>
                   </Sources>
                 )}
-              {message.parts.map((part, i) => {
-                switch (part.type) {
-                  case 'text':
-                    return (
-                      <Message
-                        key={`${message.id}-${i}`}
-                        from={message.role}
-                        className={cn(
-                          message.role === 'assistant' && 'max-w-full',
-                        )}
-                      >
-                        <MessageContent>
-                          <MessageResponse>{part.text}</MessageResponse>
-                        </MessageContent>
-                        {message.role === 'assistant' && (
-                          <MessageActions>
-                            <MessageAction
-                              onClick={() => regenerate()}
-                              label="Retry"
-                            >
-                              <RefreshCcwIcon className="size-3" />
-                            </MessageAction>
-                            <MessageAction
-                              onClick={() =>
-                                navigator.clipboard.writeText(part.text)
-                              }
-                              label="Copy"
-                            >
-                              <CopyIcon className="size-3" />
-                            </MessageAction>
-                          </MessageActions>
-                        )}
-                      </Message>
-                    )
-                  case 'reasoning':
-                    return (
-                      <Reasoning
-                        key={`${message.id}-${i}`}
-                        className="w-full"
-                        isStreaming={
-                          status === 'streaming' &&
-                          i === message.parts.length - 1 &&
-                          message.id === messages.at(-1)?.id
-                        }
-                      >
-                        <ReasoningTrigger />
-                        <ReasoningContent>{part.text}</ReasoningContent>
-                      </Reasoning>
-                    )
-                  default:
-                    return null
-                }
-              })}
+                {message.parts.map((part, i) => {
+                  switch (part.type) {
+                    case 'text':
+                      return (
+                        <Message
+                          key={`${message.id}-${i}`}
+                          from={message.role}
+                          className={cn(
+                            message.role === 'assistant' && 'max-w-full',
+                          )}
+                        >
+                          <MessageContent>
+                            <MessageResponse>{part.text}</MessageResponse>
+                          </MessageContent>
+                          {message.role === 'assistant' && (
+                            <MessageActions>
+                              <MessageAction
+                                onClick={() => regenerate()}
+                                label="Retry"
+                              >
+                                <RefreshCcwIcon className="size-3" />
+                              </MessageAction>
+                              <MessageAction
+                                onClick={() =>
+                                  navigator.clipboard.writeText(part.text)
+                                }
+                                label="Copy"
+                              >
+                                <CopyIcon className="size-3" />
+                              </MessageAction>
+                            </MessageActions>
+                          )}
+                        </Message>
+                      )
+                    case 'reasoning':
+                      return (
+                        <Reasoning
+                          key={`${message.id}-${i}`}
+                          className="w-full"
+                          isStreaming={
+                            status === 'streaming' &&
+                            i === message.parts.length - 1 &&
+                            message.id === messages.at(-1)?.id
+                          }
+                        >
+                          <ReasoningTrigger />
+                          <ReasoningContent>{part.text}</ReasoningContent>
+                        </Reasoning>
+                      )
+                    default:
+                      return null
+                  }
+                })}
               </div>
             )
           })}
