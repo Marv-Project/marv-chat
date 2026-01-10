@@ -40,10 +40,12 @@ function App() {
         <AppLeftNavHeader />
         <AppRightNavHeader />
 
-        <AppSidebar variant="inset" activeChatId={chatId} />
+        <AppSidebar activeChatId={chatId} />
 
-        <SidebarInset className="h-[calc(100svh-1rem)] overflow-hidden max-md:h-svh">
-          <Outlet />
+        <SidebarInset>
+          <div className="flex-1">
+            <Outlet />
+          </div>
         </SidebarInset>
       </SidebarProvider>
     </div>
