@@ -170,7 +170,7 @@ export const ChatInterface = ({ chatId, initialMessages }: ChatLayoutProps) => {
             )
           })}
 
-          {status === 'submitted' || (status === 'streaming' && <Loader />)}
+          {(status === 'submitted' || status === 'streaming') && <Loader />}
         </ConversationContent>
         <ConversationScrollButtonWithText className="bottom-36" />
       </Conversation>
