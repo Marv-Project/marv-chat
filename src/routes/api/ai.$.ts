@@ -28,6 +28,11 @@ export const Route = createFileRoute('/api/ai/$')({
 
         let chat = await getChatById(id)
 
+        // Verify chat belongs to authenticated user
+        if (chat && chat.userId !== context.auth.user.id) {
+          return new Response('Forbidden', { status: 403 })
+        }
+
         chat ??= await createChat(id, 'New Chat', context.auth.user.id)
 
         // Load previous messages from database

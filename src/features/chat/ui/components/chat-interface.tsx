@@ -92,21 +92,35 @@ export const ChatInterface = ({
     if (initialPrompt && chatId && !hasAutoSent.current) {
       hasAutoSent.current = true
 
+      const promptText = initialPrompt.text || ''
+
+      // Skip if no content to send
+      if (!promptText && !initialPrompt.files.length) {
+        return
+      }
+
       // Create the user message for title generation
       const userMessage: AppUIMessage = {
         id: uuidV4(),
         role: 'user',
-        parts: [{ type: 'text', text: initialPrompt.text || input }],
+        parts: [{ type: 'text', text: promptText }],
       }
 
       // Fire both in parallel - streaming response + title generation
       void sendMessage({
-        text: initialPrompt.text || input,
+        text: promptText,
         files: initialPrompt.files,
       })
 
       // Generate title in background (doesn't block streaming)
-      generateTitle({ chatId, message: userMessage })
+      generateTitle(
+        { chatId, message: userMessage },
+        {
+          onError: (error) => {
+            console.error('Failed to generate title:', error)
+          },
+        },
+      )
 
       onInitialPromptSent?.()
     }

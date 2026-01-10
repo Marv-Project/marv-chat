@@ -16,7 +16,6 @@ import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AppChatRouteImport } from './routes/_app/chat'
 import { Route as ApiOrpcSplatRouteImport } from './routes/api/orpc.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
-import { Route as ApiAiGenerateTitleRouteImport } from './routes/api/ai.generate-title'
 import { Route as ApiAiSplatRouteImport } from './routes/api/ai.$'
 import { Route as AppChatChatIdRouteImport } from './routes/_app/chat.$chatId'
 
@@ -53,11 +52,6 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAiGenerateTitleRoute = ApiAiGenerateTitleRouteImport.update({
-  id: '/api/ai/generate-title',
-  path: '/api/ai/generate-title',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiAiSplatRoute = ApiAiSplatRouteImport.update({
   id: '/api/ai/$',
   path: '/api/ai/$',
@@ -75,7 +69,6 @@ export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/chat/$chatId': typeof AppChatChatIdRoute
   '/api/ai/$': typeof ApiAiSplatRoute
-  '/api/ai/generate-title': typeof ApiAiGenerateTitleRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/orpc/$': typeof ApiOrpcSplatRoute
 }
@@ -85,7 +78,6 @@ export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/chat/$chatId': typeof AppChatChatIdRoute
   '/api/ai/$': typeof ApiAiSplatRoute
-  '/api/ai/generate-title': typeof ApiAiGenerateTitleRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/orpc/$': typeof ApiOrpcSplatRoute
 }
@@ -98,7 +90,6 @@ export interface FileRoutesById {
   '/_app/': typeof AppIndexRoute
   '/_app/chat/$chatId': typeof AppChatChatIdRoute
   '/api/ai/$': typeof ApiAiSplatRoute
-  '/api/ai/generate-title': typeof ApiAiGenerateTitleRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/orpc/$': typeof ApiOrpcSplatRoute
 }
@@ -110,7 +101,6 @@ export interface FileRouteTypes {
     | '/'
     | '/chat/$chatId'
     | '/api/ai/$'
-    | '/api/ai/generate-title'
     | '/api/auth/$'
     | '/api/orpc/$'
   fileRoutesByTo: FileRoutesByTo
@@ -120,7 +110,6 @@ export interface FileRouteTypes {
     | '/'
     | '/chat/$chatId'
     | '/api/ai/$'
-    | '/api/ai/generate-title'
     | '/api/auth/$'
     | '/api/orpc/$'
   id:
@@ -132,7 +121,6 @@ export interface FileRouteTypes {
     | '/_app/'
     | '/_app/chat/$chatId'
     | '/api/ai/$'
-    | '/api/ai/generate-title'
     | '/api/auth/$'
     | '/api/orpc/$'
   fileRoutesById: FileRoutesById
@@ -141,7 +129,6 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   ApiAiSplatRoute: typeof ApiAiSplatRoute
-  ApiAiGenerateTitleRoute: typeof ApiAiGenerateTitleRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiOrpcSplatRoute: typeof ApiOrpcSplatRoute
 }
@@ -195,13 +182,6 @@ declare module '@tanstack/react-router' {
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/ai/generate-title': {
-      id: '/api/ai/generate-title'
-      path: '/api/ai/generate-title'
-      fullPath: '/api/ai/generate-title'
-      preLoaderRoute: typeof ApiAiGenerateTitleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/ai/$': {
@@ -258,7 +238,6 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   ApiAiSplatRoute: ApiAiSplatRoute,
-  ApiAiGenerateTitleRoute: ApiAiGenerateTitleRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiOrpcSplatRoute: ApiOrpcSplatRoute,
 }

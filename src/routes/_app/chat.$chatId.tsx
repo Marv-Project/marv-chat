@@ -20,7 +20,7 @@ function RouteComponent() {
   // Clear initial prompt after it's sent to prevent re-sending on refresh
   const handleInitialPromptSent = useCallback(() => {
     // Clear the navigation state to prevent re-sending on browser back/forward
-    window.history.replaceState({}, '')
+    window.history.replaceState(null, '', window.location.pathname)
   }, [])
 
   return (
