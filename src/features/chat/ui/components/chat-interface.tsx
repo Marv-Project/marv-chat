@@ -210,7 +210,12 @@ export const ChatInterface = ({ chatId, initialMessages }: ChatLayoutProps) => {
                   <span>Search</span>
                 </PromptInputButton>
               </PromptInputTools>
-              <PromptInputSubmit disabled={!input && !status} status={status} />
+              <PromptInputSubmit
+                disabled={
+                  !input || status === 'streaming' || status === 'submitted'
+                }
+                status={status}
+              />
             </PromptInputFooter>
           </PromptInput>
         </div>
