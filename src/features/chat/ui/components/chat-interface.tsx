@@ -5,11 +5,7 @@ import { useState } from 'react'
 import { v4 as uuidV4 } from 'uuid'
 import type { PromptInputMessage } from '@/components/ai-elements/prompt-input'
 import type { AppUIMessage } from '@/lib/ai-sdk/types'
-import {
-  Conversation,
-  ConversationContent,
-  ConversationScrollButtonWithText,
-} from '@/components/ai-elements/conversation'
+import { Loader } from '@/components/ai-elements/loader'
 import {
   Message,
   MessageAction,
@@ -35,14 +31,12 @@ import {
   ReasoningContent,
   ReasoningTrigger,
 } from '@/components/ai-elements/reasoning'
-import {
-  Source,
-  Sources,
-  SourcesContent,
-  SourcesTrigger,
-} from '@/components/ai-elements/sources'
-import { Loader } from '@/components/ai-elements/loader'
 import { cn } from '@/lib/utils'
+import {
+  Conversation,
+  ConversationContent,
+  ConversationScrollButtonWithText,
+} from '@/components/ai-elements/conversation'
 
 interface ChatLayoutProps {
   chatId: string
@@ -89,98 +83,9 @@ export const ChatInterface = ({ chatId, initialMessages }: ChatLayoutProps) => {
   }
 
   return (
-    <div className="relative flex h-svh min-w-0 flex-col overflow-x-hidden">
-      <Conversation>
-        <ConversationContent className="mx-auto h-auto w-full max-w-3xl px-6 pt-20 pb-40!">
-          {messages.map((message) => {
-            const sources = message.parts.filter(
-              (part) => part.type === 'source-url',
-            )
-
-            return (
-              <div key={message.id}>
-                {message.role === 'assistant' && sources.length > 0 && (
-                  <Sources>
-                    <SourcesTrigger count={sources.length} />
-                    <SourcesContent>
-                      {sources.map((source, i) => (
-                        <Source
-                          key={`${message.id}-${i}`}
-                          href={source.url}
-                          title={source.url}
-                        />
-                      ))}
-                    </SourcesContent>
-                  </Sources>
-                )}
-              {message.parts.map((part, i) => {
-                switch (part.type) {
-                  case 'text':
-                    return (
-                      <Message
-                        key={`${message.id}-${i}`}
-                        from={message.role}
-                        className={cn(
-                          message.role === 'assistant' && 'max-w-full',
-                        )}
-                      >
-                        <MessageContent>
-                          <MessageResponse>{part.text}</MessageResponse>
-                        </MessageContent>
-                        {message.role === 'assistant' && (
-                          <MessageActions>
-                            <MessageAction
-                              onClick={() => regenerate()}
-                              label="Retry"
-                            >
-                              <RefreshCcwIcon className="size-3" />
-                            </MessageAction>
-                            <MessageAction
-                              onClick={() =>
-                                navigator.clipboard.writeText(part.text)
-                              }
-                              label="Copy"
-                            >
-                              <CopyIcon className="size-3" />
-                            </MessageAction>
-                          </MessageActions>
-                        )}
-                      </Message>
-                    )
-                  case 'reasoning':
-                    return (
-                      <Reasoning
-                        key={`${message.id}-${i}`}
-                        className="w-full"
-                        isStreaming={
-                          status === 'streaming' &&
-                          i === message.parts.length - 1 &&
-                          message.id === messages.at(-1)?.id
-                        }
-                      >
-                        <ReasoningTrigger />
-                        <ReasoningContent>{part.text}</ReasoningContent>
-                      </Reasoning>
-                    )
-                  default:
-                    return null
-                }
-              })}
-              </div>
-            )
-          })}
-
-          {(status === 'submitted' || status === 'streaming') && <Loader />}
-        </ConversationContent>
-        <ConversationScrollButtonWithText className="bottom-36" />
-      </Conversation>
-
-      <div
-        className={cn(
-          'absolute right-1/2 bottom-4 left-1/2 z-10 mx-auto flex w-full max-w-3xl -translate-x-1/2 flex-col',
-        )}
-      >
-        <div className={cn('px-4')}>
+    <>
+      <div className="absolute right-0 bottom-2 left-0 z-10 mx-auto flex w-full max-w-3xl gap-2 px-4">
+        <div className="w-full">
           <PromptInput
             className="bg-sidebar/65! supports-backdrop-filter:bg-sidebar/65! ring-sidebar-border/75 rounded-lg ring-4 backdrop-blur-sm"
             onSubmit={handleSubmit}
@@ -216,6 +121,79 @@ export const ChatInterface = ({ chatId, initialMessages }: ChatLayoutProps) => {
           </PromptInput>
         </div>
       </div>
-    </div>
+
+      <div
+        className="absolute inset-0 overflow-y-scroll pt-8 sm:pt-3.5"
+        style={{
+          paddingBottom: '144px',
+          scrollbarGutter: 'stable both-edges',
+          scrollPaddingBottom: '97px',
+        }}
+      >
+        <div className="mx-auto flex w-full max-w-3xl flex-col space-y-12 px-4 pb-10">
+          <Conversation>
+            <ConversationContent className="p-0">
+              {messages.map((message) => {
+                return (
+                  <Message
+                    key={`${message.id}`}
+                    from={message.role}
+                    className={cn(
+                      message.role === 'assistant' && 'w-full max-w-full',
+                    )}
+                  >
+                    <MessageContent>
+                      {message.parts.map((part, i) => {
+                        switch (part.type) {
+                          case 'text':
+                            return (
+                              <MessageResponse key={`${message.id}-${i}`}>
+                                {part.text}
+                              </MessageResponse>
+                            )
+                          case 'reasoning':
+                            return (
+                              <Reasoning
+                                key={`${message.id}-${i}`}
+                                className="w-full"
+                                isStreaming={
+                                  status === 'streaming' &&
+                                  i === message.parts.length - 1 &&
+                                  message.id === messages.at(-1)?.id
+                                }
+                              >
+                                <ReasoningTrigger />
+                                <ReasoningContent>{part.text}</ReasoningContent>
+                              </Reasoning>
+                            )
+                          default:
+                            return null
+                        }
+                      })}
+                    </MessageContent>
+                    {message.role === 'assistant' && (
+                      <MessageActions>
+                        <MessageAction
+                          onClick={() => regenerate()}
+                          label="Retry"
+                        >
+                          <RefreshCcwIcon className="size-3" />
+                        </MessageAction>
+                        <MessageAction label="Copy">
+                          <CopyIcon className="size-3" />
+                        </MessageAction>
+                      </MessageActions>
+                    )}
+                  </Message>
+                )
+              })}
+
+              {(status === 'submitted' || status === 'streaming') && <Loader />}
+            </ConversationContent>
+            <ConversationScrollButtonWithText className="bottom-40" />
+          </Conversation>
+        </div>
+      </div>
+    </>
   )
 }

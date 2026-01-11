@@ -120,6 +120,23 @@
 }
 
 @layer base {
+  *,
+  :after,
+  :before,
+  ::backdrop {
+    box-sizing: border-box;
+    border: 0 solid;
+    margin: 0;
+    padding: 0;
+  }
+
+  @media screen {
+    html,
+    body {
+      min-height: calc(100svh + env(safe-area-inset-top));
+    }
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
@@ -132,8 +149,12 @@
 
   /* Firefox scrollbar */
   * {
-    scrollbar-width: thin;
     scrollbar-color: theme(colors.border) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 20px;
   }
 
   ::-webkit-scrollbar-track {
