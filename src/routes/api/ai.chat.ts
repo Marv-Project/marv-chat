@@ -99,6 +99,8 @@ export const Route = createFileRoute('/api/ai/chat')({
           const streamId = uuidV4()
           await createStreamId({ chatId: id, streamId })
 
+          const modelId = 'ollamaV2:gpt-oss:120b'
+
           const stream = createUIMessageStream({
             originalMessages: messages,
             generateId: () => uuidV4(),
@@ -112,7 +114,7 @@ export const Route = createFileRoute('/api/ai/chat')({
               }
 
               const result = streamText({
-                model: registry.languageModel('ollamaV2:gpt-oss:120b'),
+                model: registry.languageModel(modelId),
                 messages: await convertToModelMessages(validatedMessages),
                 stopWhen: stepCountIs(5),
               })
@@ -142,6 +144,8 @@ export const Route = createFileRoute('/api/ai/chat')({
                     chatId: id,
                     role: currentMessage.role,
                     parts: JSON.parse(JSON.stringify(currentMessage.parts)),
+                    modelId: currentMessage.role === 'assistant' ? modelId : null,
+                    totalTokens: currentMessage.metadata?.totalTokens ?? null,
                   })),
                 })
               }
