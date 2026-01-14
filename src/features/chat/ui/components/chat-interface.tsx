@@ -1,4 +1,9 @@
-import { useNavigate, useRouter, useSearch } from '@tanstack/react-router'
+import {
+  useNavigate,
+  useRouteContext,
+  useRouter,
+  useSearch,
+} from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { v4 as uuidv4 } from 'uuid'
@@ -7,6 +12,7 @@ import { toast } from 'sonner'
 import type { AppUIMessage } from '@/lib/ai-sdk/types'
 import { Messages } from '@/features/chat/ui/components/chat-messages'
 import { MultiModalInput } from '@/features/chat/ui/components/chat-multimodal-input'
+import { ChatHeader } from '@/features/chat/ui/components/chat-header'
 
 interface ChatInterfaceProps {
   id: string
@@ -17,6 +23,7 @@ export const ChatInterface = ({ id, initialMessages }: ChatInterfaceProps) => {
   const [input, setInput] = useState<string>('')
   const hasAppendedQueryRef = useRef(false)
 
+  const { orpc, queryClient } = useRouteContext({ strict: false })
   const router = useRouter()
   const { query } = useSearch({ strict: false })
   const navigate = useNavigate()
@@ -41,8 +48,7 @@ export const ChatInterface = ({ id, initialMessages }: ChatInterfaceProps) => {
         },
       }),
       onFinish: () => {
-        // Stream completed - URL should already be at /chat/{id}
-        // (navigation happens before streaming starts)
+        void queryClient?.invalidateQueries(orpc?.chats.getAll.queryOptions())
       },
       onError: (error) => {
         console.error(error)
@@ -88,6 +94,7 @@ export const ChatInterface = ({ id, initialMessages }: ChatInterfaceProps) => {
 
   return (
     <div className="absolute top-0 bottom-0 w-full">
+      <ChatHeader />
       <div className="absolute right-0 bottom-2 left-0 z-10 mx-auto flex w-full max-w-3xl gap-2 px-4">
         <MultiModalInput
           chatId={id}
