@@ -1,4 +1,4 @@
-import { prisma } from '@/configs/prisma'
+import { db } from '@/lib/db'
 import { auth } from '@/lib/auth'
 
 export const createORPCContext = async (opts: { headers: Headers }) => {
@@ -8,7 +8,7 @@ export const createORPCContext = async (opts: { headers: Headers }) => {
 
   return {
     ...opts,
-    prisma,
+    db,
     auth: session,
   }
 }

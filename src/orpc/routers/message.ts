@@ -11,7 +11,7 @@ export const getAllMessages = protectedProcedure
     const { chatId } = input
 
     // Fetch messages in chronological order (oldest first)
-    const messages = await context.prisma.message.findMany({
+    const messages = await context.db.message.findMany({
       where: { chatId },
       orderBy: { createdAt: 'asc' }, // asc = oldest → newest (bottom)
     })
@@ -21,7 +21,6 @@ export const getAllMessages = protectedProcedure
       id: m.id,
       role: m.role,
       parts: m.parts,
-      model: m.model,
       metadata: m.metadata,
       createdAt: m.createdAt,
       updatedAt: m.updatedAt,

@@ -5,10 +5,6 @@ import {
   useParams,
 } from '@tanstack/react-router'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import {
-  AppLeftNavHeader,
-  AppRightNavHeader,
-} from '@/features/app/ui/components/app-header'
 import { AppSidebar } from '@/features/app/ui/components/app-sidebar'
 import { getAuthFn } from '@/functions/get-auth-fn'
 
@@ -35,19 +31,12 @@ function App() {
   const chatId = params.chatId
 
   return (
-    <div className="h-svh w-full overflow-hidden">
-      <SidebarProvider>
-        <AppLeftNavHeader />
-        <AppRightNavHeader />
+    <SidebarProvider>
+      <AppSidebar activeChatId={chatId} />
 
-        <AppSidebar activeChatId={chatId} />
-
-        <SidebarInset>
-          <div className="flex-1">
-            <Outlet />
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
-    </div>
+      <SidebarInset className="relative flex min-h-[calc(100svh+env(safe-area-inset-top))] w-full flex-1 flex-col overflow-hidden transition-[width,height]">
+        <Outlet />
+      </SidebarInset>
+    </SidebarProvider>
   )
 }

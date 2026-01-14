@@ -103,7 +103,7 @@ model Jwks {
 model Chat {
   id        String   @id @default(uuid())
   userId    String
-  title     String
+  title     String   @default("New Chat")
   pinned    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -111,6 +111,7 @@ model Chat {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   messages Message[]
+  streams  Stream[]
 
   @@map("chats")
 }
@@ -122,17 +123,29 @@ enum MessageRole {
 }
 
 model Message {
-  id        String      @id @default(uuid())
-  chatId    String
-  role      MessageRole
-  parts     Json
-  model     String
-  metadata  Json?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id          String      @id @default(uuid())
+  chatId      String
+  role        MessageRole
+  parts       Json
+  modelId     String?
+  totalTokens Int?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
 
   @@index([chatId])
   @@map("messages")
+}
+
+model Stream {
+  id        String   @id @default(uuid())
+  chatId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@index([chatId])
+  @@map("Stream")
 }

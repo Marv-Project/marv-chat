@@ -11,7 +11,7 @@ import {
 } from 'better-auth/plugins'
 import { tanstackStartCookies } from 'better-auth/tanstack-start'
 import { env } from '@/configs/env'
-import { prisma } from '@/configs/prisma'
+import { db } from '@/lib/db'
 
 export const auth = betterAuth({
   appName: env.VITE_APP_TITLE,
@@ -28,7 +28,7 @@ export const auth = betterAuth({
     },
     encryptOAuthTokens: true,
   },
-  database: prismaAdapter(prisma, {
+  database: prismaAdapter(db, {
     provider: 'postgresql',
   }),
   emailAndPassword: {
