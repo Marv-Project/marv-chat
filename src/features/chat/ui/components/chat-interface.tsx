@@ -1,199 +1,106 @@
+import { useRouter, useSearch } from '@tanstack/react-router'
+import { useEffect, useRef, useState } from 'react'
 import { useChat } from '@ai-sdk/react'
+import { v4 as uuidv4 } from 'uuid'
 import { DefaultChatTransport } from 'ai'
-import { CopyIcon, GlobeIcon, RefreshCcwIcon } from 'lucide-react'
-import { useState } from 'react'
-import { v4 as uuidV4 } from 'uuid'
-import type { PromptInputMessage } from '@/components/ai-elements/prompt-input'
+import { toast } from 'sonner'
 import type { AppUIMessage } from '@/lib/ai-sdk/types'
-import { Loader } from '@/components/ai-elements/loader'
-import {
-  Message,
-  MessageAction,
-  MessageActions,
-  MessageContent,
-  MessageResponse,
-} from '@/components/ai-elements/message'
-import {
-  PromptInput,
-  PromptInputActionAddAttachments,
-  PromptInputActionMenu,
-  PromptInputActionMenuContent,
-  PromptInputActionMenuTrigger,
-  PromptInputBody,
-  PromptInputButton,
-  PromptInputFooter,
-  PromptInputSubmit,
-  PromptInputTextarea,
-  PromptInputTools,
-} from '@/components/ai-elements/prompt-input'
-import {
-  Reasoning,
-  ReasoningContent,
-  ReasoningTrigger,
-} from '@/components/ai-elements/reasoning'
-import { cn } from '@/lib/utils'
-import {
-  Conversation,
-  ConversationContent,
-  ConversationScrollButtonWithText,
-} from '@/components/ai-elements/conversation'
+import { Messages } from '@/features/chat/ui/components/chat-messages'
+import { MultiModalInput } from '@/features/chat/ui/components/chat-multimodal-input'
 
-interface ChatLayoutProps {
-  chatId: string
-  initialMessages?: AppUIMessage[]
+interface ChatInterfaceProps {
+  id: string
+  initialMessages: AppUIMessage[]
 }
 
-export const ChatInterface = ({ chatId, initialMessages }: ChatLayoutProps) => {
-  const [input, setInput] = useState('')
+export const ChatInterface = ({ id, initialMessages }: ChatInterfaceProps) => {
+  const [input, setInput] = useState<string>('')
+  const hasAppendedQueryRef = useRef(false)
 
-  const { messages, sendMessage, status, regenerate } = useChat({
-    id: chatId,
-    messages: initialMessages,
-    generateId: () => uuidV4(),
-    transport: new DefaultChatTransport({
-      api: '/api/ai',
-      prepareSendMessagesRequest: ({
-        body,
-        messages: prepareMessages,
-        id: prepareId,
-      }) => {
-        return {
-          body: {
-            message: prepareMessages[prepareMessages.length - 1],
-            id: prepareId,
-            ...body,
-          },
-        }
+  const router = useRouter()
+  const { query } = useSearch({ strict: false })
+
+  const { sendMessage, messages, status, regenerate, stop } =
+    useChat<AppUIMessage>({
+      id,
+      messages: initialMessages,
+      generateId: uuidv4,
+      transport: new DefaultChatTransport({
+        api: '/api/ai/chat',
+        prepareSendMessagesRequest: (request) => {
+          const lastMessage = request.messages.at(-1)
+
+          return {
+            body: {
+              id: request.id,
+              message: lastMessage,
+              ...request.body,
+            },
+          }
+        },
+      }),
+      onFinish: () => {
+        // Stream completed - URL should already be at /chat/{id}
+        // (navigation happens before streaming starts)
       },
-    }),
-  })
-
-  const handleSubmit = (message: PromptInputMessage) => {
-    const hasText = Boolean(message.text)
-    const hasAttachments = Boolean(message.files.length)
-
-    if (!(hasText || hasAttachments)) return
-
-    void sendMessage({
-      text: message.text || 'Sent with attachments',
-      files: message.files,
+      onError: (error) => {
+        console.error(error)
+        toast.error('Failed to generate response', {
+          description: error.message,
+        })
+      },
     })
 
-    setInput('')
-  }
+  // handle browser back/forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      // When user navigates back/forward, refresh to sync with URL
+      void router.invalidate()
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [router])
+
+  useEffect(() => {
+    if (query && !hasAppendedQueryRef.current) {
+      // Set ref immediately (synchronous) to prevent double execution
+      hasAppendedQueryRef.current = true
+
+      // Send the message from the query param (passed from homepage navigation)
+      void sendMessage({
+        role: 'user' as const,
+        parts: [{ type: 'text', text: query }],
+      })
+
+      // Clean up the query param from URL without adding history entry
+      window.history.replaceState({}, '', `/chat/${id}`)
+    }
+  }, [query, sendMessage, id])
 
   return (
-    <>
+    <div className="absolute top-0 bottom-0 w-full">
       <div className="absolute right-0 bottom-2 left-0 z-10 mx-auto flex w-full max-w-3xl gap-2 px-4">
-        <div className="w-full">
-          <PromptInput
-            className="bg-sidebar/65! supports-backdrop-filter:bg-sidebar/65! ring-sidebar-border/75 rounded-lg ring-4 backdrop-blur-sm"
-            onSubmit={handleSubmit}
-            globalDrop
-            multiple
-          >
-            <PromptInputBody>
-              <PromptInputTextarea
-                onChange={(e) => setInput(e.target.value)}
-                value={input}
-              />
-            </PromptInputBody>
-            <PromptInputFooter>
-              <PromptInputTools>
-                <PromptInputActionMenu>
-                  <PromptInputActionMenuTrigger />
-                  <PromptInputActionMenuContent>
-                    <PromptInputActionAddAttachments />
-                  </PromptInputActionMenuContent>
-                </PromptInputActionMenu>
-                <PromptInputButton>
-                  <GlobeIcon size={16} />
-                  <span>Search</span>
-                </PromptInputButton>
-              </PromptInputTools>
-              <PromptInputSubmit
-                disabled={
-                  !input || status === 'streaming' || status === 'submitted'
-                }
-                status={status}
-              />
-            </PromptInputFooter>
-          </PromptInput>
-        </div>
+        <MultiModalInput
+          chatId={id}
+          input={input}
+          setInput={setInput}
+          status={status}
+          stop={stop}
+          messages={messages}
+          sendMessage={sendMessage}
+        />
       </div>
 
-      <div
-        className="absolute inset-0 overflow-y-scroll pt-8 sm:pt-3.5"
-        style={{
-          paddingBottom: '144px',
-          scrollbarGutter: 'stable both-edges',
-          scrollPaddingBottom: '97px',
-        }}
-      >
-        <div className="mx-auto flex w-full max-w-3xl flex-col space-y-12 px-4 pb-10">
-          <Conversation>
-            <ConversationContent className="p-0">
-              {messages.map((message) => {
-                return (
-                  <Message
-                    key={`${message.id}`}
-                    from={message.role}
-                    className={cn(
-                      message.role === 'assistant' && 'w-full max-w-full',
-                    )}
-                  >
-                    <MessageContent>
-                      {message.parts.map((part, i) => {
-                        switch (part.type) {
-                          case 'text':
-                            return (
-                              <MessageResponse key={`${message.id}-${i}`}>
-                                {part.text}
-                              </MessageResponse>
-                            )
-                          case 'reasoning':
-                            return (
-                              <Reasoning
-                                key={`${message.id}-${i}`}
-                                className="w-full"
-                                isStreaming={
-                                  status === 'streaming' &&
-                                  i === message.parts.length - 1 &&
-                                  message.id === messages.at(-1)?.id
-                                }
-                              >
-                                <ReasoningTrigger />
-                                <ReasoningContent>{part.text}</ReasoningContent>
-                              </Reasoning>
-                            )
-                          default:
-                            return null
-                        }
-                      })}
-                    </MessageContent>
-                    {message.role === 'assistant' && (
-                      <MessageActions>
-                        <MessageAction
-                          onClick={() => regenerate()}
-                          label="Retry"
-                        >
-                          <RefreshCcwIcon className="size-3" />
-                        </MessageAction>
-                        <MessageAction label="Copy">
-                          <CopyIcon className="size-3" />
-                        </MessageAction>
-                      </MessageActions>
-                    )}
-                  </Message>
-                )
-              })}
-
-              {(status === 'submitted' || status === 'streaming') && <Loader />}
-            </ConversationContent>
-            <ConversationScrollButtonWithText className="bottom-40" />
-          </Conversation>
-        </div>
-      </div>
-    </>
+      <Messages
+        chatId={id}
+        messages={messages}
+        status={status}
+        regenerate={regenerate}
+        key={id}
+      />
+    </div>
   )
 }
