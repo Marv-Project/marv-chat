@@ -1,4 +1,4 @@
-import { useRouter, useSearch } from '@tanstack/react-router'
+import { useNavigate, useRouter, useSearch } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { v4 as uuidv4 } from 'uuid'
@@ -19,6 +19,7 @@ export const ChatInterface = ({ id, initialMessages }: ChatInterfaceProps) => {
 
   const router = useRouter()
   const { query } = useSearch({ strict: false })
+  const navigate = useNavigate()
 
   const { sendMessage, messages, status, regenerate, stop } =
     useChat<AppUIMessage>({
@@ -76,7 +77,12 @@ export const ChatInterface = ({ id, initialMessages }: ChatInterfaceProps) => {
       })
 
       // Clean up the query param from URL without adding history entry
-      window.history.replaceState({}, '', `/chat/${id}`)
+      void navigate({
+        to: `/chat/$chatId`,
+        params: { chatId: id },
+        replace: true,
+        viewTransition: true,
+      })
     }
   }, [query, sendMessage, id])
 

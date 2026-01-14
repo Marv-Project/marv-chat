@@ -25,12 +25,12 @@ export const saveMessages = async ({
   messages: Prisma.Args<typeof db.message, 'createMany'>['data']
 }) => {
   try {
-    const createdMessages = await db.message.createMany({
+    const result = await db.message.createMany({
       data: messages,
       skipDuplicates: true,
     })
 
-    return createdMessages
+    return result
   } catch (error) {
     console.error('Failed to save messages', error)
     throw new ChatSDKError('bad_request:database', 'Failed to save messages')

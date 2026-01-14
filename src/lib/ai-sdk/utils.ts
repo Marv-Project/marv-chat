@@ -22,11 +22,21 @@ export const generateTitleFromUserMessage = async ({
 }: {
   message: AppUIMessage
 }) => {
-  const { text: title } = await generateText({
-    model: registry.languageModel('ollamaV2:gpt-oss:120b'),
-    system: titlePrompt,
-    prompt: getTextFromMessage(message),
-  })
+  const prompt = getTextFromMessage(message)
+  if (!prompt.trim()) {
+    return 'New conversation'
+  }
 
-  return title
+  try {
+    const { text: title } = await generateText({
+      model: registry.languageModel('ollamaV2:gpt-oss:120b'),
+      system: titlePrompt,
+      prompt,
+    })
+
+    return title
+  } catch (error) {
+    console.error('Failed to generate title:', error)
+    return 'New conversation'
+  }
 }

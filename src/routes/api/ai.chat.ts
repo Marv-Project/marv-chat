@@ -57,7 +57,6 @@ export const Route = createFileRoute('/api/ai/chat')({
               return new ChatSDKError('forbidden:chat').toResponse()
             }
           } else if (message.role === 'user') {
-            console.log('[message request]:', message)
             // save chat immediately with placeholder title
             await saveChat({
               chatId: id,
@@ -107,10 +106,17 @@ export const Route = createFileRoute('/api/ai/chat')({
             execute: async ({ writer: dataStream }) => {
               // handle title generation in paralel
               if (titlePromise) {
-                void titlePromise.then((title) => {
-                  void updateChatTitleById({ chatId: id, title })
-                  dataStream.write({ type: 'data-chat-title', data: { title } })
-                })
+                void titlePromise
+                  .then((title) => {
+                    void updateChatTitleById({ chatId: id, title })
+                    dataStream.write({
+                      type: 'data-chat-title',
+                      data: { title },
+                    })
+                  })
+                  .catch((error) => {
+                    console.error('Failed to update chat title:', error)
+                  })
               }
 
               const result = streamText({
@@ -144,7 +150,8 @@ export const Route = createFileRoute('/api/ai/chat')({
                     chatId: id,
                     role: currentMessage.role,
                     parts: JSON.parse(JSON.stringify(currentMessage.parts)),
-                    modelId: currentMessage.role === 'assistant' ? modelId : null,
+                    modelId:
+                      currentMessage.role === 'assistant' ? modelId : null,
                     totalTokens: currentMessage.metadata?.totalTokens ?? null,
                   })),
                 })

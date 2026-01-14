@@ -57,6 +57,7 @@ export const MultiModalInput = ({
         to: '/chat/$chatId',
         params: { chatId },
         search: { query: input },
+        viewTransition: true,
       })
     } else {
       // Already on chat page, just send the message

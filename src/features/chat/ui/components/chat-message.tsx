@@ -104,8 +104,12 @@ const ChatMessageAction = ({
       return
     }
 
-    await copyToClipboard(textFromParts)
-    toast.success('Copied to clipboard!')
+    const ok = await copyToClipboard(textFromParts)
+    if (ok) {
+      toast.success('Copied to clipboard!')
+    } else {
+      toast.error('Failed to copy to clipboard')
+    }
   }
 
   if (message.role === 'user') {
