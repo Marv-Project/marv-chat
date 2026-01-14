@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ORPCError } from '@orpc/server'
 import { protectedProcedure } from '@/orpc'
 
 export const getAllChat = protectedProcedure.handler(async ({ context }) => {
@@ -10,10 +11,53 @@ export const getAllChat = protectedProcedure.handler(async ({ context }) => {
   return chats
 })
 
+export const renameChat = protectedProcedure
+  .input(z.object({ chatId: z.string(), title: z.string().trim().min(1) }))
+  .handler(async ({ context, input }) => {
+    const chat = await context.db.chat.findUnique({
+      where: { id: input.chatId },
+    })
+
+    if (!chat) {
+      throw new ORPCError('NOT_FOUND', {
+        message: 'Chat not found',
+      })
+    }
+
+    if (chat.userId !== context.auth.user.id) {
+      throw new ORPCError('FORBIDDEN', {
+        message: 'You do not have permission to rename this chat',
+      })
+    }
+
+    const updatedChat = await context.db.chat.update({
+      where: { id: input.chatId },
+      data: { title: input.title },
+    })
+
+    return updatedChat
+  })
+
 export const deleteChat = protectedProcedure
   .input(z.object({ chatId: z.string() }))
   .handler(async ({ context, input }) => {
-    const chat = await context.db.chat.delete({
+    const chat = await context.db.chat.findUnique({
+      where: { id: input.chatId },
+    })
+
+    if (!chat) {
+      throw new ORPCError('NOT_FOUND', {
+        message: 'Chat not found',
+      })
+    }
+
+    if (chat.userId !== context.auth.user.id) {
+      throw new ORPCError('FORBIDDEN', {
+        message: 'You do not have permission to delete this chat',
+      })
+    }
+
+    await context.db.chat.delete({
       where: { id: input.chatId },
     })
 

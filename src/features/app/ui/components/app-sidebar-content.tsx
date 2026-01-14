@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 import {
   FolderIcon,
   MoreHorizontalIcon,
-  ShareIcon,
+  PencilIcon,
   Trash2Icon,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -27,6 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { RenameChatDialog } from '@/features/app/ui/components/rename-chat-dialog'
 
 interface AppSidebarContentProps {
   items: RouterOutputs['chats']['getAll']
@@ -38,6 +39,7 @@ export const AppSidebarContent = ({
   activeChatId,
 }: AppSidebarContentProps) => {
   const { isMobile } = useSidebar()
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedChat, setSelectedChat] = useState<{
     id: string
@@ -46,6 +48,11 @@ export const AppSidebarContent = ({
 
   // Group chats by time periods
   const { groupedChats, periodsWithChats } = useGroupedChats(items)
+
+  const handleRenameClick = (chatId: string, chatTitle: string) => {
+    setSelectedChat({ id: chatId, title: chatTitle })
+    setRenameDialogOpen(true)
+  }
 
   const handleDeleteClick = (chatId: string, chatTitle: string) => {
     setSelectedChat({ id: chatId, title: chatTitle })
@@ -81,9 +88,11 @@ export const AppSidebarContent = ({
             <FolderIcon />
             <span>Open</span>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <ShareIcon />
-            <span>Share</span>
+          <DropdownMenuItem
+            onClick={() => handleRenameClick(item.id, item.title)}
+          >
+            <PencilIcon />
+            <span>Rename</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -100,6 +109,15 @@ export const AppSidebarContent = ({
 
   return (
     <>
+      {selectedChat && (
+        <RenameChatDialog
+          chatId={selectedChat.id}
+          chatTitle={selectedChat.title}
+          open={renameDialogOpen}
+          onOpenChange={setRenameDialogOpen}
+        />
+      )}
+
       {selectedChat && (
         <DeleteChatDialog
           chatId={selectedChat.id}
