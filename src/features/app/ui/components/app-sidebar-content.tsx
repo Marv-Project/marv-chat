@@ -28,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { RenameChatDialog } from '@/features/app/ui/components/rename-chat-dialog'
+import { AppTooltip } from '@/components/global/app-tooltip'
 
 interface AppSidebarContentProps {
   items: RouterOutputs['chats']['getAll']
@@ -62,12 +63,14 @@ export const AppSidebarContent = ({
   // Render a single chat item with all interactions
   const renderChatItem = (item: RouterOutputs['chats']['getAll'][number]) => (
     <SidebarMenuItem key={item.id}>
-      <SidebarMenuButton isActive={item.id === activeChatId} asChild>
-        <Link to="/chat/$chatId" params={{ chatId: item.id }} viewTransition>
-          <IconMessageChatbot />
-          <span>{item.title}</span>
-        </Link>
-      </SidebarMenuButton>
+      <AppTooltip content={item.title} side="bottom">
+        <SidebarMenuButton isActive={item.id === activeChatId} asChild>
+          <Link to="/chat/$chatId" params={{ chatId: item.id }} viewTransition>
+            <IconMessageChatbot />
+            <span>{item.title}</span>
+          </Link>
+        </SidebarMenuButton>
+      </AppTooltip>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -83,6 +86,7 @@ export const AppSidebarContent = ({
           className="w-24 rounded-lg"
           side={isMobile ? 'bottom' : 'right'}
           align={isMobile ? 'end' : 'start'}
+          sideOffset={isMobile ? 10 : 20}
         >
           <DropdownMenuItem>
             <FolderIcon />
