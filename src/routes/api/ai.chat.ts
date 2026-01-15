@@ -99,7 +99,7 @@ export const Route = createFileRoute('/api/ai/chat')({
           const streamId = uuidV4()
           await createStreamId({ chatId: id, streamId })
 
-          const modelId = 'ollamaV2:gpt-oss:120b'
+          const modelId = 'ollamaV2:qwen3-vl:235b'
 
           const stream = createUIMessageStream({
             originalMessages: messages,

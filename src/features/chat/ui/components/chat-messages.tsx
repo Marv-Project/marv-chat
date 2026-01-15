@@ -1,6 +1,7 @@
 import { useStickToBottom } from 'use-stick-to-bottom'
 import { ChevronDownIcon } from 'lucide-react'
 import { Fragment } from 'react/jsx-runtime'
+import { AnimatePresence, motion } from 'motion/react'
 import type { UseChatHelpers } from '@ai-sdk/react'
 import type { AppUIMessage } from '@/lib/ai-sdk/types'
 import { PreviewMessage } from '@/features/chat/ui/components/chat-message'
@@ -12,6 +13,7 @@ import {
   SourcesContent,
   SourcesTrigger,
 } from '@/components/ai-elements/sources'
+import { MarvIcon } from '@/components/global/marv-icon'
 
 interface MessagesProps {
   chatId: string
@@ -44,7 +46,7 @@ export const Messages = ({
         }}
       >
         <div ref={contentRef}>
-          <div className="mx-auto flex w-full max-w-3xl flex-col space-y-12 px-4 pb-10">
+          <div className="mx-auto flex w-full max-w-3xl flex-col space-y-4 px-4 pb-10">
             {messages.map((message, index) => (
               <Fragment key={message.id}>
                 {message.role === 'assistant' &&
@@ -85,6 +87,23 @@ export const Messages = ({
                 />
               </Fragment>
             ))}
+
+            {/* Streaming indicator - single instance with enter/exit animations */}
+            <AnimatePresence>
+              {status === 'streaming' &&
+                messages.at(-1)?.role === 'assistant' && (
+                  <motion.div
+                    key="streaming-indicator"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.3, ease: 'easeOut' }}
+                    className="pointer-events-none"
+                  >
+                    <MarvIcon className="h-10 w-fit" animate />
+                  </motion.div>
+                )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
