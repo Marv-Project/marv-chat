@@ -24,12 +24,27 @@ interface MessageProps {
   regenerate: UseChatHelpers<AppUIMessage>['regenerate']
 }
 
+// Priority order for part types (lower = first)
+const partTypePriority: Record<string, number> = {
+  reasoning: 0,
+  text: 1,
+}
+
 export const PreviewMessage = ({
   chatId,
   message,
   isLoading,
   regenerate,
 }: MessageProps) => {
+  // Sort parts: reasoning first, then text (some models output reasoning last)
+  const sortedParts =
+    message.role === 'assistant'
+      ? [...message.parts].sort(
+          (a, b) =>
+            (partTypePriority[a.type] ?? 99) - (partTypePriority[b.type] ?? 99),
+        )
+      : message.parts
+
   return (
     <>
       <Message
@@ -38,7 +53,7 @@ export const PreviewMessage = ({
         className={cn(message.role === 'assistant' && 'w-full max-w-full')}
       >
         <MessageContent>
-          {message.parts.map((part, i) => {
+          {sortedParts.map((part, i) => {
             switch (part.type) {
               case 'text':
                 return (
