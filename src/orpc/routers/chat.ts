@@ -38,6 +38,33 @@ export const renameChat = protectedProcedure
     return updatedChat
   })
 
+export const togglePinChat = protectedProcedure
+  .input(z.object({ chatId: z.string() }))
+  .handler(async ({ context, input }) => {
+    const chat = await context.db.chat.findUnique({
+      where: { id: input.chatId },
+    })
+
+    if (!chat) {
+      throw new ORPCError('NOT_FOUND', {
+        message: 'Chat not found',
+      })
+    }
+
+    if (chat.userId !== context.auth.user.id) {
+      throw new ORPCError('FORBIDDEN', {
+        message: 'You do not have permission to pin this chat',
+      })
+    }
+
+    // Use raw SQL to bypass Prisma's @updatedAt auto-update
+    await context.db.$executeRaw`
+      UPDATE "chats" SET "pinned" = ${!chat.pinned} WHERE "id" = ${input.chatId}
+    `
+
+    return { ...chat, pinned: !chat.pinned }
+  })
+
 export const deleteChat = protectedProcedure
   .input(z.object({ chatId: z.string() }))
   .handler(async ({ context, input }) => {

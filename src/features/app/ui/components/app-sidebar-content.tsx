@@ -1,15 +1,27 @@
-import { IconMessageChatbot } from '@tabler/icons-react'
 import { Link } from '@tanstack/react-router'
 import {
-  FolderIcon,
+  ChevronRightIcon,
   MoreHorizontalIcon,
   PencilIcon,
+  PinIcon,
+  PinOffIcon,
   Trash2Icon,
 } from 'lucide-react'
 import { useState } from 'react'
 import type { RouterOutputs } from '@/orpc/routers'
-import { DeleteChatDialog } from '@/features/app/ui/components/delete-chat-dialog'
-import { useGroupedChats } from '@/hooks/chat/use-grouped-chats'
+import { AppTooltip } from '@/components/global/app-tooltip'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   SidebarContent,
   SidebarGroup,
@@ -20,15 +32,10 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { DeleteChatDialog } from '@/features/app/ui/components/delete-chat-dialog'
 import { RenameChatDialog } from '@/features/app/ui/components/rename-chat-dialog'
-import { AppTooltip } from '@/components/global/app-tooltip'
+import { useGroupedChats } from '@/hooks/chat/use-grouped-chats'
+import { useTogglePinChat } from '@/hooks/chat/use-toggle-pin-chat'
 
 interface AppSidebarContentProps {
   items: RouterOutputs['chats']['getAll']
@@ -47,8 +54,14 @@ export const AppSidebarContent = ({
     title: string
   } | null>(null)
 
-  // Group chats by time periods
-  const { groupedChats, periodsWithChats } = useGroupedChats(items)
+  const { mutate: togglePin } = useTogglePinChat()
+
+  // Separate pinned and non-pinned chats
+  const pinnedChats = items.filter((item) => item.pinned)
+  const unpinnedChats = items.filter((item) => !item.pinned)
+
+  // Group only non-pinned chats by time periods
+  const { groupedChats, periodsWithChats } = useGroupedChats(unpinnedChats)
 
   const handleRenameClick = (chatId: string, chatTitle: string) => {
     setSelectedChat({ id: chatId, title: chatTitle })
@@ -65,8 +78,12 @@ export const AppSidebarContent = ({
     <SidebarMenuItem key={item.id}>
       <AppTooltip content={item.title} side="bottom">
         <SidebarMenuButton isActive={item.id === activeChatId} asChild>
-          <Link to="/chat/$chatId" params={{ chatId: item.id }} viewTransition>
-            <IconMessageChatbot />
+          <Link
+            to="/chat/$chatId"
+            params={{ chatId: item.id }}
+            viewTransition
+            className="pl-4 text-sm"
+          >
             <span>{item.title}</span>
           </Link>
         </SidebarMenuButton>
@@ -88,9 +105,9 @@ export const AppSidebarContent = ({
           align={isMobile ? 'end' : 'start'}
           sideOffset={isMobile ? 10 : 20}
         >
-          <DropdownMenuItem>
-            <FolderIcon />
-            <span>Open</span>
+          <DropdownMenuItem onClick={() => togglePin({ chatId: item.id })}>
+            {item.pinned ? <PinOffIcon /> : <PinIcon />}
+            <span>{item.pinned ? 'Unpin' : 'Pin'}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => handleRenameClick(item.id, item.title)}
@@ -133,10 +150,28 @@ export const AppSidebarContent = ({
       )}
 
       <SidebarContent className="mt-2">
+        {pinnedChats.length > 0 && (
+          <Collapsible defaultOpen className="group/collapsible">
+            <SidebarGroup className="py-0 group-data-[collapsible=icon]:hidden">
+              <SidebarGroupLabel asChild>
+                <CollapsibleTrigger className="flex w-full items-center">
+                  <PinIcon className="mr-1 size-3" />
+                  Pinned
+                  <ChevronRightIcon className="ml-auto size-4 transition-transform group-data-[state=open]/collapsible:rotate-90" />
+                </CollapsibleTrigger>
+              </SidebarGroupLabel>
+
+              <CollapsibleContent>
+                <SidebarMenu>{pinnedChats.map(renderChatItem)}</SidebarMenu>
+              </CollapsibleContent>
+            </SidebarGroup>
+          </Collapsible>
+        )}
+
         {periodsWithChats.map((period) => (
           <SidebarGroup
             key={period}
-            className="group-data-[collapsible=icon]:hidden"
+            className="py-0 group-data-[collapsible=icon]:hidden"
           >
             <SidebarGroupLabel>{period}</SidebarGroupLabel>
 

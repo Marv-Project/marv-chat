@@ -26,7 +26,7 @@ export const AppSidebarHeader = () => {
         </SidebarMenuItem>
       </SidebarMenu>
 
-      <SidebarGroup>
+      <SidebarGroup className="px-0">
         <SidebarGroupContent className="flex flex-col gap-2">
           <SidebarMenu>
             <SidebarMenuItem>
@@ -45,7 +45,7 @@ export const AppSidebarHeader = () => {
       </SidebarGroup>
 
       <form>
-        <SidebarGroup className="py-0">
+        <SidebarGroup className="px-0 py-0">
           <SidebarGroupContent className="relative">
             <Label htmlFor="search" className="sr-only">
               Search
