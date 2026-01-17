@@ -1,4 +1,4 @@
-import { CopyIcon, RefreshCcwIcon } from 'lucide-react'
+import { CopyIcon, GitBranchIcon, RefreshCcwIcon } from 'lucide-react'
 import { useCopyToClipboard } from 'usehooks-ts'
 import { toast } from 'sonner'
 import type { UseChatHelpers } from '@ai-sdk/react'
@@ -16,10 +16,12 @@ import {
   ReasoningContent,
   ReasoningTrigger,
 } from '@/components/ai-elements/reasoning'
+import { useBranchChat } from '@/hooks/chat/use-branch-chat'
 
 interface MessageProps {
   chatId: string
   message: AppUIMessage
+  messageIndex: number
   isLoading: boolean
   regenerate: UseChatHelpers<AppUIMessage>['regenerate']
 }
@@ -33,6 +35,7 @@ const partTypePriority: Record<string, number> = {
 export const PreviewMessage = ({
   chatId,
   message,
+  messageIndex,
   isLoading,
   regenerate,
 }: MessageProps) => {
@@ -81,6 +84,7 @@ export const PreviewMessage = ({
         <ChatMessageAction
           chatId={chatId}
           message={message}
+          messageIndex={messageIndex}
           isLoading={isLoading}
           regenerate={regenerate}
         />
@@ -92,16 +96,20 @@ export const PreviewMessage = ({
 interface ChatMessageActionProps {
   chatId: string
   message: AppUIMessage
+  messageIndex: number
   isLoading: boolean
   regenerate: UseChatHelpers<AppUIMessage>['regenerate']
 }
 
 const ChatMessageAction = ({
+  chatId,
   message,
+  messageIndex,
   isLoading,
   regenerate,
 }: ChatMessageActionProps) => {
   const [, copyToClipboard] = useCopyToClipboard()
+  const { mutate: branchChat, isPending: isBranching } = useBranchChat()
 
   if (isLoading) {
     return null
@@ -127,11 +135,18 @@ const ChatMessageAction = ({
     }
   }
 
+  const handleBranch = () => {
+    branchChat({ chatId, messageIndex })
+  }
+
   if (message.role === 'user') {
     return (
       <MessageActions className="justify-end">
         <MessageAction onClick={handleCopy} label="Copy">
           <CopyIcon className="size-3" />
+        </MessageAction>
+        <MessageAction onClick={handleBranch} label="Branch" disabled={isBranching}>
+          <GitBranchIcon className="size-3" />
         </MessageAction>
       </MessageActions>
     )
@@ -141,6 +156,9 @@ const ChatMessageAction = ({
     <MessageActions>
       <MessageAction onClick={handleCopy} label="Copy">
         <CopyIcon className="size-3" />
+      </MessageAction>
+      <MessageAction onClick={handleBranch} label="Branch" disabled={isBranching}>
+        <GitBranchIcon className="size-3" />
       </MessageAction>
       <MessageAction onClick={() => regenerate()} label="Retry">
         <RefreshCcwIcon className="size-3" />

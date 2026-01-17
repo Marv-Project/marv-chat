@@ -80,6 +80,7 @@ export const Messages = ({
                 <PreviewMessage
                   chatId={chatId}
                   message={message}
+                  messageIndex={index}
                   isLoading={
                     status === 'streaming' && messages.length - 1 === index
                   }

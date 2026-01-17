@@ -7,6 +7,7 @@ const loginRouterSchema = z.object({
 
 const chatIdRouterSchema = z.object({
   query: z.string().optional(),
+  autoGenerate: z.boolean().optional(),
 })
 
 export const loginRouterValidator = zodValidator(loginRouterSchema)

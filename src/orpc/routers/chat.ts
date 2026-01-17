@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { ORPCError } from '@orpc/server'
 import { protectedProcedure } from '@/orpc'
+import { branchChat as branchChatQuery } from '@/lib/db/queries/chat.query'
 
 export const getAllChat = protectedProcedure.handler(async ({ context }) => {
   const chats = await context.db.chat.findMany({
@@ -89,4 +90,32 @@ export const deleteChat = protectedProcedure
     })
 
     return chat
+  })
+
+export const branchChat = protectedProcedure
+  .input(z.object({ chatId: z.string(), messageIndex: z.number().int().min(0) }))
+  .handler(async ({ context, input }) => {
+    const chat = await context.db.chat.findUnique({
+      where: { id: input.chatId },
+    })
+
+    if (!chat) {
+      throw new ORPCError('NOT_FOUND', {
+        message: 'Chat not found',
+      })
+    }
+
+    if (chat.userId !== context.auth.user.id) {
+      throw new ORPCError('FORBIDDEN', {
+        message: 'You do not have permission to branch this chat',
+      })
+    }
+
+    const newChat = await branchChatQuery({
+      sourceChatId: input.chatId,
+      messageIndex: input.messageIndex,
+      userId: context.auth.user.id,
+    })
+
+    return newChat
   })

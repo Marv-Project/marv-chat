@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import {
   ChevronRightIcon,
+  GitBranchIcon,
   MoreHorizontalIcon,
   PencilIcon,
   PinIcon,
@@ -84,6 +85,9 @@ export const AppSidebarContent = ({
             viewTransition
             className="pl-4 text-sm"
           >
+            {item.branchedFromId && (
+              <GitBranchIcon className="text-muted-foreground size-3 shrink-0" />
+            )}
             <span>{item.title}</span>
           </Link>
         </SidebarMenuButton>
