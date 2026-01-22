@@ -1,4 +1,4 @@
-import { CopyIcon, RefreshCcwIcon } from 'lucide-react'
+import { CopyIcon, GitBranchIcon, RefreshCcwIcon } from 'lucide-react'
 import { useCopyToClipboard } from 'usehooks-ts'
 import { toast } from 'sonner'
 import type { UseChatHelpers } from '@ai-sdk/react'
@@ -16,20 +16,38 @@ import {
   ReasoningContent,
   ReasoningTrigger,
 } from '@/components/ai-elements/reasoning'
+import { useBranchChat } from '@/hooks/chat/use-branch-chat'
 
 interface MessageProps {
   chatId: string
   message: AppUIMessage
+  messageIndex: number
   isLoading: boolean
   regenerate: UseChatHelpers<AppUIMessage>['regenerate']
+}
+
+// Priority order for part types (lower = first)
+const partTypePriority: Record<string, number> = {
+  reasoning: 0,
+  text: 1,
 }
 
 export const PreviewMessage = ({
   chatId,
   message,
+  messageIndex,
   isLoading,
   regenerate,
 }: MessageProps) => {
+  // Sort parts: reasoning first, then text (some models output reasoning last)
+  const sortedParts =
+    message.role === 'assistant'
+      ? [...message.parts].sort(
+          (a, b) =>
+            (partTypePriority[a.type] ?? 99) - (partTypePriority[b.type] ?? 99),
+        )
+      : message.parts
+
   return (
     <>
       <Message
@@ -38,7 +56,7 @@ export const PreviewMessage = ({
         className={cn(message.role === 'assistant' && 'w-full max-w-full')}
       >
         <MessageContent>
-          {message.parts.map((part, i) => {
+          {sortedParts.map((part, i) => {
             switch (part.type) {
               case 'text':
                 return (
@@ -66,6 +84,7 @@ export const PreviewMessage = ({
         <ChatMessageAction
           chatId={chatId}
           message={message}
+          messageIndex={messageIndex}
           isLoading={isLoading}
           regenerate={regenerate}
         />
@@ -77,16 +96,20 @@ export const PreviewMessage = ({
 interface ChatMessageActionProps {
   chatId: string
   message: AppUIMessage
+  messageIndex: number
   isLoading: boolean
   regenerate: UseChatHelpers<AppUIMessage>['regenerate']
 }
 
 const ChatMessageAction = ({
+  chatId,
   message,
+  messageIndex,
   isLoading,
   regenerate,
 }: ChatMessageActionProps) => {
   const [, copyToClipboard] = useCopyToClipboard()
+  const { mutate: branchChat, isPending: isBranching } = useBranchChat()
 
   if (isLoading) {
     return null
@@ -112,11 +135,18 @@ const ChatMessageAction = ({
     }
   }
 
+  const handleBranch = () => {
+    branchChat({ chatId, messageIndex })
+  }
+
   if (message.role === 'user') {
     return (
       <MessageActions className="justify-end">
         <MessageAction onClick={handleCopy} label="Copy">
           <CopyIcon className="size-3" />
+        </MessageAction>
+        <MessageAction onClick={handleBranch} label="Branch" disabled={isBranching}>
+          <GitBranchIcon className="size-3" />
         </MessageAction>
       </MessageActions>
     )
@@ -126,6 +156,9 @@ const ChatMessageAction = ({
     <MessageActions>
       <MessageAction onClick={handleCopy} label="Copy">
         <CopyIcon className="size-3" />
+      </MessageAction>
+      <MessageAction onClick={handleBranch} label="Branch" disabled={isBranching}>
+        <GitBranchIcon className="size-3" />
       </MessageAction>
       <MessageAction onClick={() => regenerate()} label="Retry">
         <RefreshCcwIcon className="size-3" />

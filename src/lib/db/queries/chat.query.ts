@@ -1,3 +1,5 @@
+import { v4 as uuidV4 } from 'uuid'
+import type { InputJsonValue } from '@/generated/prisma/internal/prismaNamespace'
 import { db } from '@/lib/db'
 import { ChatSDKError } from '@/lib/errors'
 
@@ -63,5 +65,68 @@ export const updateChatTitleById = async ({
       'bad_request:database',
       'Failed to update chat title',
     )
+  }
+}
+
+export const branchChat = async ({
+  sourceChatId,
+  messageIndex,
+  userId,
+}: {
+  sourceChatId: string
+  messageIndex: number
+  userId: string
+}) => {
+  try {
+    return await db.$transaction(async (tx) => {
+      // Get source chat
+      const sourceChat = await tx.chat.findUnique({
+        where: { id: sourceChatId },
+      })
+
+      if (!sourceChat) {
+        throw new ChatSDKError('bad_request:database', 'Source chat not found')
+      }
+
+      // Get messages up to and including the branch point
+      const messages = await tx.message.findMany({
+        where: { chatId: sourceChatId },
+        orderBy: { createdAt: 'asc' },
+        take: messageIndex + 1,
+      })
+
+      // Create new branch chat
+      const newChatId = uuidV4()
+      const newChat = await tx.chat.create({
+        data: {
+          id: newChatId,
+          userId,
+          title: `${sourceChat.title} (Branch)`,
+          branchedFromId: sourceChatId,
+          branchedAtMsgIdx: messageIndex,
+        },
+      })
+
+      // Copy messages with new UUIDs
+      if (messages.length > 0) {
+        await tx.message.createMany({
+          data: messages.map((msg) => ({
+            id: uuidV4(),
+            chatId: newChatId,
+            role: msg.role,
+            parts: msg.parts as InputJsonValue,
+            modelId: msg.modelId,
+            totalTokens: msg.totalTokens,
+            createdAt: msg.createdAt,
+          })),
+        })
+      }
+
+      return newChat
+    })
+  } catch (error) {
+    if (error instanceof ChatSDKError) throw error
+    console.error('Failed to branch chat', error)
+    throw new ChatSDKError('bad_request:database', 'Failed to branch chat')
   }
 }

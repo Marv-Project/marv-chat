@@ -5,6 +5,7 @@ import {
   JsonToSseTransformStream,
   convertToModelMessages,
   createUIMessageStream,
+  smoothStream,
   stepCountIs,
   streamText,
   validateUIMessages,
@@ -98,7 +99,7 @@ export const Route = createFileRoute('/api/ai/chat')({
           const streamId = uuidV4()
           await createStreamId({ chatId: id, streamId })
 
-          const modelId = 'ollamaV2:gpt-oss:120b'
+          const modelId = 'ollama:gpt-oss:120b' as const
 
           const stream = createUIMessageStream({
             originalMessages: messages,
@@ -123,6 +124,10 @@ export const Route = createFileRoute('/api/ai/chat')({
                 model: registry.languageModel(modelId),
                 messages: await convertToModelMessages(validatedMessages),
                 stopWhen: stepCountIs(5),
+                experimental_transform: smoothStream({
+                  delayInMs: 20,
+                  chunking: 'word',
+                }),
               })
 
               result.consumeStream()
@@ -130,6 +135,7 @@ export const Route = createFileRoute('/api/ai/chat')({
               dataStream.merge(
                 result.toUIMessageStream({
                   sendReasoning: true,
+                  sendSources: true,
                   messageMetadata: ({ part }) => {
                     if (part.type === 'finish') {
                       console.log('total tokens:', part.totalUsage.totalTokens)
