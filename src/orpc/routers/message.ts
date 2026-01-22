@@ -21,7 +21,8 @@ export const getAllMessages = protectedProcedure
       id: m.id,
       role: m.role,
       parts: m.parts,
-      metadata: m.metadata,
+      modelId: m.modelId,
+      totalTokens: m.totalTokens,
       createdAt: m.createdAt,
       updatedAt: m.updatedAt,
     }))
