@@ -64,18 +64,18 @@ const AppChatChatIdRoute = AppChatChatIdRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof AppIndexRoute
   '/chat': typeof AppChatRouteWithChildren
   '/login': typeof AuthLoginRoute
-  '/': typeof AppIndexRoute
   '/chat/$chatId': typeof AppChatChatIdRoute
   '/api/ai/chat': typeof ApiAiChatRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/orpc/$': typeof ApiOrpcSplatRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof AppIndexRoute
   '/chat': typeof AppChatRouteWithChildren
   '/login': typeof AuthLoginRoute
-  '/': typeof AppIndexRoute
   '/chat/$chatId': typeof AppChatChatIdRoute
   '/api/ai/chat': typeof ApiAiChatRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -96,18 +96,18 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/chat'
     | '/login'
-    | '/'
     | '/chat/$chatId'
     | '/api/ai/chat'
     | '/api/auth/$'
     | '/api/orpc/$'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/chat'
     | '/login'
-    | '/'
     | '/chat/$chatId'
     | '/api/ai/chat'
     | '/api/auth/$'
@@ -138,14 +138,14 @@ declare module '@tanstack/react-router' {
     '/_auth': {
       id: '/_auth'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app': {
       id: '/_app'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
