@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import {
   Tooltip,
   TooltipContent,
@@ -12,7 +13,7 @@ export const AppTooltip = ({
 }: {
   side?: 'bottom' | 'top' | 'right' | 'left' | undefined
   sideOffset?: number
-  children: React.ReactNode
+  children: ReactNode
   content: string
 }) => {
   return (

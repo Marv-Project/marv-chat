@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { useForm } from '@tanstack/react-form'
+import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -58,6 +59,12 @@ export function RenameChatDialog({
       )
     },
   })
+
+  useEffect(() => {
+    if (open) {
+      form.reset({ title: chatTitle })
+    }
+  }, [open, chatTitle])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -4,7 +4,7 @@ import type { UIDataTypes, UIMessage } from 'ai'
 // Metadata schema (all fields optional for backward compatibility)
 export const messageMetadataSchema = z.object({
   modelId: z.string().optional(),
-  createdAt: z.date().optional(),
+  createdAt: z.coerce.date().optional(),
   totalTokens: z.number().optional(),
 })
 
