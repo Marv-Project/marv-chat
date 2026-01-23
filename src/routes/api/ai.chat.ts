@@ -1,20 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { formatISO } from 'date-fns'
-import { v4 as uuidV4 } from 'uuid'
-import {
-  JsonToSseTransformStream,
-  convertToModelMessages,
-  createUIMessageStream,
-  smoothStream,
-  stepCountIs,
-  streamText,
-  validateUIMessages,
-} from 'ai'
-import type { PostRequestBodySchema } from '@/schemas/api.schema'
+import { registry } from '@/lib/ai-sdk/registry'
 import type { AppUIMessage } from '@/lib/ai-sdk/types'
-import { authMiddleware } from '@/middlewares/auth'
-import { postRequestBodySchema } from '@/schemas/api.schema'
-import { ChatSDKError } from '@/lib/errors'
+import { generateTitleFromUserMessage } from '@/lib/ai-sdk/utils'
 import {
   getChatById,
   saveChat,
@@ -24,9 +10,22 @@ import {
   getMessagesByChatId,
   saveMessages,
 } from '@/lib/db/queries/message.query'
-import { generateTitleFromUserMessage } from '@/lib/ai-sdk/utils'
 import { createStreamId } from '@/lib/db/queries/stream.query'
-import { registry } from '@/lib/ai-sdk/registry'
+import { ChatSDKError } from '@/lib/errors'
+import { authMiddleware } from '@/middlewares/auth'
+import type { PostRequestBodySchema } from '@/schemas/api.schema'
+import { postRequestBodySchema } from '@/schemas/api.schema'
+import { createFileRoute } from '@tanstack/react-router'
+import {
+  JsonToSseTransformStream,
+  convertToModelMessages,
+  createUIMessageStream,
+  smoothStream,
+  stepCountIs,
+  streamText,
+  validateUIMessages,
+} from 'ai'
+import { v4 as uuidV4 } from 'uuid'
 
 export const Route = createFileRoute('/api/ai/chat')({
   server: {
@@ -74,7 +73,9 @@ export const Route = createFileRoute('/api/ai/chat')({
             role: m.role as 'user' | 'assistant' | 'system',
             parts: m.parts as AppUIMessage['parts'],
             metadata: {
-              createdAt: formatISO(m.createdAt),
+              modelId: m.modelId,
+              totalTokens: m.totalTokens,
+              createdAt: m.createdAt,
             },
           }))
           const messages = [...mapUIMessages, message]
