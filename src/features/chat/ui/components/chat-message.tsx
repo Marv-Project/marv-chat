@@ -69,7 +69,7 @@ export const PreviewMessage = ({
                   <Reasoning
                     key={`${message.id}-${i}`}
                     className="w-full"
-                    isStreaming={isLoading}
+                    isStreaming={isLoading && i === message.parts.length - 1}
                   >
                     <ReasoningTrigger />
                     <ReasoningContent>{part.text}</ReasoningContent>
@@ -145,7 +145,11 @@ const ChatMessageAction = ({
         <MessageAction onClick={handleCopy} label="Copy">
           <CopyIcon className="size-3" />
         </MessageAction>
-        <MessageAction onClick={handleBranch} label="Branch" disabled={isBranching}>
+        <MessageAction
+          onClick={handleBranch}
+          label="Branch"
+          disabled={isBranching}
+        >
           <GitBranchIcon className="size-3" />
         </MessageAction>
       </MessageActions>
@@ -157,7 +161,11 @@ const ChatMessageAction = ({
       <MessageAction onClick={handleCopy} label="Copy">
         <CopyIcon className="size-3" />
       </MessageAction>
-      <MessageAction onClick={handleBranch} label="Branch" disabled={isBranching}>
+      <MessageAction
+        onClick={handleBranch}
+        label="Branch"
+        disabled={isBranching}
+      >
         <GitBranchIcon className="size-3" />
       </MessageAction>
       <MessageAction onClick={() => regenerate()} label="Retry">
