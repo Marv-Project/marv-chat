@@ -122,11 +122,11 @@ export const MultiModalInput = ({
             </PromptInputButton>
           </PromptInputTools>
 
-          {status === 'submitted' ? (
+          {status === 'streaming' ? (
             <StopButton stop={stop} />
           ) : (
             <PromptInputSubmit
-              disabled={!input || status === 'streaming' || !input.trim()}
+              disabled={!input || status === 'submitted' || !input.trim()}
               status={status}
             />
           )}
