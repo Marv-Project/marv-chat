@@ -11,11 +11,7 @@ export const useMessages = (chatId: string) => {
     id: m.id,
     role: m.role,
     parts: m.parts,
-    metadata: {
-      modelId: m.modelId,
-      createdAt: m.createdAt,
-      totalTokens: m.totalTokens,
-    },
+    metadata: m.metadata,
   })) as AppUIMessage[]
 
   return {

@@ -69,7 +69,8 @@ export const PreviewMessage = ({
                   <Reasoning
                     key={`${message.id}-${i}`}
                     className="w-full"
-                    isStreaming={isLoading && i === message.parts.length - 1}
+                    isStreaming={isLoading}
+                    defaultOpen={false}
                   >
                     <ReasoningTrigger />
                     <ReasoningContent>{part.text}</ReasoningContent>

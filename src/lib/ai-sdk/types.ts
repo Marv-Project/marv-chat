@@ -5,7 +5,7 @@ import type { UIDataTypes, UIMessage } from 'ai'
 export const messageMetadataSchema = z.object({
   modelId: z.string().nullish(),
   createdAt: z.coerce.date().nullish(),
-  totalTokens: z.number().nullish(),
+  totalTokens: z.coerce.number().nullish(),
 })
 
 export type MessageMetadata = z.infer<typeof messageMetadataSchema>

@@ -1,5 +1,4 @@
-import { registry } from '@/lib/ai-sdk/registry'
-import type { AppUIMessage } from '@/lib/ai-sdk/types'
+import { type AppUIMessage } from '@/lib/ai-sdk/types'
 import { generateTitleFromUserMessage } from '@/lib/ai-sdk/utils'
 import {
   getChatById,
@@ -15,6 +14,7 @@ import { ChatSDKError } from '@/lib/errors'
 import { authMiddleware } from '@/middlewares/auth'
 import type { PostRequestBodySchema } from '@/schemas/api.schema'
 import { postRequestBodySchema } from '@/schemas/api.schema'
+import { google, GoogleGenerativeAIProviderOptions } from '@ai-sdk/google'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   JsonToSseTransformStream,
@@ -72,11 +72,7 @@ export const Route = createFileRoute('/api/ai/chat')({
             id: m.id,
             role: m.role as 'user' | 'assistant' | 'system',
             parts: m.parts as AppUIMessage['parts'],
-            metadata: {
-              modelId: m.modelId,
-              totalTokens: m.totalTokens,
-              createdAt: m.createdAt,
-            },
+            metadata: m.metadata as AppUIMessage['metadata'],
           }))
           const messages = [...mapUIMessages, message]
           const validatedMessages = await validateUIMessages({
@@ -92,6 +88,9 @@ export const Route = createFileRoute('/api/ai/chat')({
                   chatId: id,
                   role: 'user',
                   parts: JSON.parse(JSON.stringify(message.parts)),
+                  metadata: message.metadata
+                    ? JSON.parse(JSON.stringify(message.metadata))
+                    : null,
                 },
               ],
             })
@@ -100,7 +99,7 @@ export const Route = createFileRoute('/api/ai/chat')({
           const streamId = uuidV4()
           await createStreamId({ chatId: id, streamId })
 
-          const modelId = 'ollama:gpt-oss:120b' as const
+          const modelId = 'gemini-2.5-flash-lite' as const
 
           const stream = createUIMessageStream({
             originalMessages: messages,
@@ -122,13 +121,26 @@ export const Route = createFileRoute('/api/ai/chat')({
               }
 
               const result = streamText({
-                model: registry.languageModel(modelId),
+                model: google(modelId),
                 messages: await convertToModelMessages(validatedMessages),
                 stopWhen: stepCountIs(5),
                 experimental_transform: smoothStream({
                   delayInMs: 20,
                   chunking: 'word',
                 }),
+                tools: {
+                  google_search: google.tools.googleSearch({}),
+                  url_context: google.tools.urlContext({}),
+                },
+                providerOptions: {
+                  google: {
+                    thinkingConfig: {
+                      // thinkingLevel: 'minimal',
+                      thinkingBudget: 8192,
+                      includeThoughts: true,
+                    },
+                  } satisfies GoogleGenerativeAIProviderOptions,
+                },
               })
 
               result.consumeStream()
@@ -138,9 +150,15 @@ export const Route = createFileRoute('/api/ai/chat')({
                   sendReasoning: true,
                   sendSources: true,
                   messageMetadata: ({ part }) => {
-                    if (part.type === 'finish') {
-                      console.log('total tokens:', part.totalUsage.totalTokens)
+                    if (part.type === 'start') {
                       return {
+                        createdAt: new Date(),
+                      }
+                    }
+
+                    if (part.type === 'finish') {
+                      return {
+                        modelId,
                         totalTokens: part.totalUsage.totalTokens,
                       }
                     }
@@ -157,9 +175,9 @@ export const Route = createFileRoute('/api/ai/chat')({
                     chatId: id,
                     role: currentMessage.role,
                     parts: JSON.parse(JSON.stringify(currentMessage.parts)),
-                    modelId:
-                      currentMessage.role === 'assistant' ? modelId : null,
-                    totalTokens: currentMessage.metadata?.totalTokens ?? null,
+                    metadata: currentMessage.metadata
+                      ? JSON.parse(JSON.stringify(currentMessage.metadata))
+                      : null,
                   })),
                 })
               }
