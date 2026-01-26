@@ -88,9 +88,7 @@ export const Route = createFileRoute('/api/ai/chat')({
                   chatId: id,
                   role: 'user',
                   parts: JSON.parse(JSON.stringify(message.parts)),
-                  metadata: message.metadata
-                    ? JSON.parse(JSON.stringify(message.metadata))
-                    : null,
+                  metadata: message.metadata,
                 },
               ],
             })
@@ -175,9 +173,7 @@ export const Route = createFileRoute('/api/ai/chat')({
                     chatId: id,
                     role: currentMessage.role,
                     parts: JSON.parse(JSON.stringify(currentMessage.parts)),
-                    metadata: currentMessage.metadata
-                      ? JSON.parse(JSON.stringify(currentMessage.metadata))
-                      : null,
+                    metadata: currentMessage.metadata,
                   })),
                 })
               }
