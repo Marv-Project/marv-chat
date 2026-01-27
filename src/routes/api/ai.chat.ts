@@ -133,7 +133,6 @@ export const Route = createFileRoute('/api/ai/chat')({
                 providerOptions: {
                   google: {
                     thinkingConfig: {
-                      // thinkingLevel: 'minimal',
                       thinkingBudget: 8192,
                       includeThoughts: true,
                     },

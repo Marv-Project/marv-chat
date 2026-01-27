@@ -1,19 +1,19 @@
+import { TanStackDevtools } from '@tanstack/react-devtools'
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import {
   HeadContent,
+  Outlet,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 
-import appCss from '../styles.css?url'
-import type { QueryClient } from '@tanstack/react-query'
-import type { orpc } from '@/orpc/client'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
-import { NotFoundComponent } from '@/components/global/not-found-component'
-import { ErrorComponent } from '@/components/global/error-component'
+import { getAuthFn } from '@/functions/get-auth-fn'
+import type { orpc } from '@/orpc/client'
+import type { QueryClient } from '@tanstack/react-query'
+import appCss from '../styles.css?url'
 
 interface MyRouterContext {
   orpc: typeof orpc
@@ -41,11 +41,20 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
     ],
   }),
-
-  shellComponent: RootDocument,
-  notFoundComponent: NotFoundComponent,
-  errorComponent: (error) => <ErrorComponent {...error} />,
+  beforeLoad: async () => {
+    const auth = await getAuthFn()
+    return { auth }
+  },
+  component: RootComponent,
 })
+
+function RootComponent() {
+  return (
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
+  )
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (

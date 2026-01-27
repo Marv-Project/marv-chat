@@ -1,20 +1,15 @@
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { AppSidebar } from '@/features/app/ui/components/app-sidebar'
 import {
   Outlet,
   createFileRoute,
   redirect,
   useParams,
 } from '@tanstack/react-router'
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/features/app/ui/components/app-sidebar'
-import { getAuthFn } from '@/functions/get-auth-fn'
 
 export const Route = createFileRoute('/_app')({
   component: App,
-  beforeLoad: async () => {
-    const auth = await getAuthFn()
-    return { auth }
-  },
-  loader: ({ context, location }) => {
+  beforeLoad: ({ context, location }) => {
     if (!context.auth) {
       throw redirect({
         from: '/',

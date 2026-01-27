@@ -11,6 +11,7 @@ export const Route = createFileRoute('/_app/chat/$chatId')({
       orpc.messages.getAll.queryOptions({ input: { chatId: params.chatId } }),
     )
   },
+  pendingComponent: () => <div>Loading in Chat ID...</div>,
 })
 
 function RouteComponent() {

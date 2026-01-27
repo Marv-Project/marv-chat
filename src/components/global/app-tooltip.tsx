@@ -10,14 +10,16 @@ export const AppTooltip = ({
   content,
   side,
   sideOffset,
+  delayDuration = 500,
 }: {
   side?: 'bottom' | 'top' | 'right' | 'left' | undefined
   sideOffset?: number
   children: ReactNode
   content: string
+  delayDuration?: number
 }) => {
   return (
-    <Tooltip delayDuration={1000} disableHoverableContent={true}>
+    <Tooltip delayDuration={delayDuration} disableHoverableContent={true}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
       <TooltipContent
         side={side}
