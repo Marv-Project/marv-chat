@@ -13,7 +13,11 @@
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "db:start": "docker compose up -d",
+    "db:watch": "docker compose up",
+    "db:stop": "docker compose stop",
+    "db:down": "docker compose down"
   },
   "dependencies": {
     "@ai-sdk/devtools": "^0.0.4",
@@ -32,6 +36,7 @@
     "@orpc/tanstack-query": "^1.13.4",
     "@orpc/zod": "^1.13.4",
     "@prisma/adapter-neon": "^7.3.0",
+    "@prisma/adapter-pg": "^7.3.0",
     "@prisma/client": "^7.3.0",
     "@radix-ui/react-use-controllable-state": "^1.2.2",
     "@rive-app/react-webgl2": "^4.26.1",
