@@ -26,7 +26,6 @@ export const getRouter = () => {
         </AppQueryProvider>
       )
     },
-    defaultPendingComponent: () => <div>Loading...</div>,
     defaultNotFoundComponent: NotFoundComponent,
     defaultErrorComponent: (error) => <ErrorComponent {...error} />,
   })

@@ -16,6 +16,7 @@ import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AppChatRouteImport } from './routes/_app/chat'
 import { Route as ApiOrpcSplatRouteImport } from './routes/api/orpc.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
+import { Route as ApiAiEnhancePromptRouteImport } from './routes/api/ai.enhance-prompt'
 import { Route as ApiAiChatRouteImport } from './routes/api/ai.chat'
 import { Route as AppChatChatIdRouteImport } from './routes/_app/chat.$chatId'
 
@@ -52,6 +53,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAiEnhancePromptRoute = ApiAiEnhancePromptRouteImport.update({
+  id: '/api/ai/enhance-prompt',
+  path: '/api/ai/enhance-prompt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAiChatRoute = ApiAiChatRouteImport.update({
   id: '/api/ai/chat',
   path: '/api/ai/chat',
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/chat/$chatId': typeof AppChatChatIdRoute
   '/api/ai/chat': typeof ApiAiChatRoute
+  '/api/ai/enhance-prompt': typeof ApiAiEnhancePromptRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/orpc/$': typeof ApiOrpcSplatRoute
 }
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/chat/$chatId': typeof AppChatChatIdRoute
   '/api/ai/chat': typeof ApiAiChatRoute
+  '/api/ai/enhance-prompt': typeof ApiAiEnhancePromptRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/orpc/$': typeof ApiOrpcSplatRoute
 }
@@ -90,6 +98,7 @@ export interface FileRoutesById {
   '/_app/': typeof AppIndexRoute
   '/_app/chat/$chatId': typeof AppChatChatIdRoute
   '/api/ai/chat': typeof ApiAiChatRoute
+  '/api/ai/enhance-prompt': typeof ApiAiEnhancePromptRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/orpc/$': typeof ApiOrpcSplatRoute
 }
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/chat/$chatId'
     | '/api/ai/chat'
+    | '/api/ai/enhance-prompt'
     | '/api/auth/$'
     | '/api/orpc/$'
   fileRoutesByTo: FileRoutesByTo
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/chat/$chatId'
     | '/api/ai/chat'
+    | '/api/ai/enhance-prompt'
     | '/api/auth/$'
     | '/api/orpc/$'
   id:
@@ -121,6 +132,7 @@ export interface FileRouteTypes {
     | '/_app/'
     | '/_app/chat/$chatId'
     | '/api/ai/chat'
+    | '/api/ai/enhance-prompt'
     | '/api/auth/$'
     | '/api/orpc/$'
   fileRoutesById: FileRoutesById
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   ApiAiChatRoute: typeof ApiAiChatRoute
+  ApiAiEnhancePromptRoute: typeof ApiAiEnhancePromptRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiOrpcSplatRoute: typeof ApiOrpcSplatRoute
 }
@@ -182,6 +195,13 @@ declare module '@tanstack/react-router' {
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ai/enhance-prompt': {
+      id: '/api/ai/enhance-prompt'
+      path: '/api/ai/enhance-prompt'
+      fullPath: '/api/ai/enhance-prompt'
+      preLoaderRoute: typeof ApiAiEnhancePromptRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/ai/chat': {
@@ -238,6 +258,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   ApiAiChatRoute: ApiAiChatRoute,
+  ApiAiEnhancePromptRoute: ApiAiEnhancePromptRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiOrpcSplatRoute: ApiOrpcSplatRoute,
 }

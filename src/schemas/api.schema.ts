@@ -15,7 +15,7 @@ const appUIMessageSchema = z.object({
   id: z.string(),
   role: z.enum(['user', 'assistant', 'system']),
   parts: z.array(messagePartSchema),
-  metadata: messageMetadataSchema.optional(),
+  metadata: messageMetadataSchema.nullish(),
 })
 
 export const postRequestBodySchema = z.object({
