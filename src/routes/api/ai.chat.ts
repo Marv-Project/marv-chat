@@ -1,6 +1,6 @@
+import { getLanguageModel } from '@/lib/ai-sdk/config'
 import { type AppUIMessage } from '@/lib/ai-sdk/types'
 import { generateTitleFromUserMessage } from '@/lib/ai-sdk/utils'
-import { logger } from '@/lib/logger'
 import {
   getChatById,
   saveChat,
@@ -12,15 +12,16 @@ import {
 } from '@/lib/db/queries/message.query'
 import { createStreamId } from '@/lib/db/queries/stream.query'
 import { ChatSDKError } from '@/lib/errors'
+import { logger } from '@/lib/logger'
 import { authMiddleware } from '@/middlewares/auth'
 import type { PostRequestBodySchema } from '@/schemas/api.schema'
 import { postRequestBodySchema } from '@/schemas/api.schema'
-import { google, GoogleGenerativeAIProviderOptions } from '@ai-sdk/google'
+import { GoogleGenerativeAIProviderOptions } from '@ai-sdk/google'
 import { createFileRoute } from '@tanstack/react-router'
 import {
-  JsonToSseTransformStream,
   convertToModelMessages,
   createUIMessageStream,
+  JsonToSseTransformStream,
   smoothStream,
   stepCountIs,
   streamText,
@@ -33,7 +34,10 @@ export const Route = createFileRoute('/api/ai/chat')({
     middleware: [authMiddleware],
     handlers: {
       POST: async ({ request, context }) => {
-        logger.info({ method: 'POST', path: '/api/ai/chat' }, 'Request received')
+        logger.info(
+          { method: 'POST', path: '/api/ai/chat' },
+          'Request received',
+        )
 
         let requestBody: PostRequestBodySchema
         try {
@@ -45,7 +49,8 @@ export const Route = createFileRoute('/api/ai/chat')({
         }
 
         try {
-          const { id, message } = requestBody
+          const { id, message, modelId } = requestBody
+          logger.info({ modelId }, 'Request model ID')
 
           if (!context.auth) {
             return new ChatSDKError('unauthorized:chat').toResponse()
@@ -100,8 +105,6 @@ export const Route = createFileRoute('/api/ai/chat')({
           const streamId = uuidV4()
           await createStreamId({ chatId: id, streamId })
 
-          const modelId = 'gemini-2.5-flash-lite' as const
-
           const stream = createUIMessageStream({
             originalMessages: messages,
             generateId: () => uuidV4(),
@@ -117,22 +120,21 @@ export const Route = createFileRoute('/api/ai/chat')({
                     })
                   })
                   .catch((error) => {
-                    logger.error({ err: error, chatId: id }, 'Failed to update chat title')
+                    logger.error(
+                      { err: error, chatId: id },
+                      'Failed to update chat title',
+                    )
                   })
               }
 
               const result = streamText({
-                model: google(modelId),
+                model: getLanguageModel(modelId),
                 messages: await convertToModelMessages(validatedMessages),
                 stopWhen: stepCountIs(5),
                 experimental_transform: smoothStream({
                   delayInMs: 20,
                   chunking: 'word',
                 }),
-                tools: {
-                  google_search: google.tools.googleSearch({}),
-                  url_context: google.tools.urlContext({}),
-                },
                 providerOptions: {
                   google: {
                     thinkingConfig: {

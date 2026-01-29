@@ -16,6 +16,7 @@ import type { Dispatch, SetStateAction } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { useLocalStorage } from 'usehooks-ts'
+import { ChatModelSelector } from './chat-model-selector'
 
 interface MultiModalInputProps {
   chatId: string
@@ -132,6 +133,8 @@ export const MultiModalInput = ({
         </PromptInputBody>
         <PromptInputFooter>
           <PromptInputTools>
+            <ChatModelSelector />
+
             <PromptInputButton
               onClick={handleEnhancePrompt}
               disabled={!input.trim() || isEnhancing}
