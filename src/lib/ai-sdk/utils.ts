@@ -1,6 +1,7 @@
 import { generateText } from 'ai'
 import type { AppUIMessage } from '@/lib/ai-sdk/types'
 import { registry } from '@/lib/ai-sdk/registry'
+import { logger } from '@/lib/logger'
 
 const titlePrompt = `Generate a very short chat title (2-5 words max) based on the user's message.
 Rules:
@@ -36,7 +37,7 @@ export const generateTitleFromUserMessage = async ({
 
     return title
   } catch (error) {
-    console.error('Failed to generate title:', error)
+    logger.error({ err: error }, 'Failed to generate title')
     return 'New conversation'
   }
 }

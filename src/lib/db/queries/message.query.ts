@@ -1,6 +1,7 @@
 import type { Prisma } from '@/generated/prisma/client'
 import { db } from '@/lib/db'
 import { ChatSDKError } from '@/lib/errors'
+import { logger } from '@/lib/logger'
 
 export const getMessagesByChatId = async (chatId: string) => {
   try {
@@ -11,7 +12,7 @@ export const getMessagesByChatId = async (chatId: string) => {
 
     return messages
   } catch (error) {
-    console.error('Failed to get messages by chat id', error)
+    logger.error({ err: error }, 'Failed to get messages by chat id')
     throw new ChatSDKError(
       'bad_request:database',
       'Failed to get messages by chat id',
@@ -32,7 +33,7 @@ export const saveMessages = async ({
 
     return result
   } catch (error) {
-    console.error('Failed to save messages', error)
+    logger.error({ err: error }, 'Failed to save messages')
     throw new ChatSDKError('bad_request:database', 'Failed to save messages')
   }
 }

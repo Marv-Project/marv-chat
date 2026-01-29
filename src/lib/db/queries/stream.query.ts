@@ -1,5 +1,6 @@
 import { db } from '@/lib/db'
 import { ChatSDKError } from '@/lib/errors'
+import { logger } from '@/lib/logger'
 
 export const createStreamId = async ({
   chatId,
@@ -18,7 +19,7 @@ export const createStreamId = async ({
 
     return stream
   } catch (error) {
-    console.error('Failed to create stream', error)
+    logger.error({ err: error }, 'Failed to create stream')
     throw new ChatSDKError('bad_request:database', 'Failed to create stream')
   }
 }

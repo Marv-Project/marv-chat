@@ -1,5 +1,6 @@
 import { type AppUIMessage } from '@/lib/ai-sdk/types'
 import { generateTitleFromUserMessage } from '@/lib/ai-sdk/utils'
+import { logger } from '@/lib/logger'
 import {
   getChatById,
   saveChat,
@@ -32,12 +33,14 @@ export const Route = createFileRoute('/api/ai/chat')({
     middleware: [authMiddleware],
     handlers: {
       POST: async ({ request, context }) => {
+        logger.info({ method: 'POST', path: '/api/ai/chat' }, 'Request received')
+
         let requestBody: PostRequestBodySchema
         try {
           const json = await request.json()
           requestBody = postRequestBodySchema.parse(json)
         } catch (error) {
-          console.log('Invalid request body', error)
+          logger.warn({ err: error }, 'Invalid request body')
           return new ChatSDKError('bad_request:api').toResponse()
         }
 
@@ -114,7 +117,7 @@ export const Route = createFileRoute('/api/ai/chat')({
                     })
                   })
                   .catch((error) => {
-                    console.error('Failed to update chat title:', error)
+                    logger.error({ err: error, chatId: id }, 'Failed to update chat title')
                   })
               }
 
@@ -178,9 +181,7 @@ export const Route = createFileRoute('/api/ai/chat')({
               }
             },
             onError: () => {
-              console.log(
-                'Oops, an error occurred while generating the response. Please try again.',
-              )
+              logger.error('Stream generation error')
               return 'Oops, an error occurred while generating the response. Please try again.'
             },
           })
@@ -200,7 +201,7 @@ export const Route = createFileRoute('/api/ai/chat')({
             return error.toResponse()
           }
 
-          console.log('Unhandled error in chat API', error)
+          logger.error({ err: error }, 'Unhandled error in chat API')
           return new ChatSDKError('offline:chat').toResponse()
         }
       },

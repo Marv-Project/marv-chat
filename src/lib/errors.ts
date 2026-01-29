@@ -1,3 +1,5 @@
+import { logger } from '@/lib/logger'
+
 export type ErrorType =
   | 'bad_request'
   | 'unauthorized'
@@ -59,11 +61,7 @@ export class ChatSDKError extends Error {
     const { message, cause, statusCode } = this
 
     if (visibility === 'log') {
-      console.error({
-        code,
-        message,
-        cause,
-      })
+      logger.error({ code, message, cause }, 'ChatSDKError')
 
       return Response.json(
         { code: '', message: 'Something went wrong. Please try again later.' },

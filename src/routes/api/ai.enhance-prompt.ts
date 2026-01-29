@@ -1,5 +1,6 @@
 import { registry } from '@/lib/ai-sdk/registry'
 import { ChatSDKError } from '@/lib/errors'
+import { logger } from '@/lib/logger'
 import { authMiddleware } from '@/middlewares/auth'
 import { createFileRoute } from '@tanstack/react-router'
 import { generateText } from 'ai'
@@ -26,6 +27,8 @@ export const Route = createFileRoute('/api/ai/enhance-prompt')({
     middleware: [authMiddleware],
     handlers: {
       POST: async ({ request, context }) => {
+        logger.info({ method: 'POST', path: '/api/ai/enhance-prompt' }, 'Request received')
+
         try {
           const json = await request.json()
           const { prompt } = enhancePromptSchema.parse(json)
@@ -48,7 +51,7 @@ export const Route = createFileRoute('/api/ai/enhance-prompt')({
             return new ChatSDKError('bad_request:api').toResponse()
           }
 
-          console.error('Failed to enhance prompt:', error)
+          logger.error({ err: error }, 'Failed to enhance prompt')
           return new ChatSDKError('offline:chat').toResponse()
         }
       },
