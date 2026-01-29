@@ -2,6 +2,7 @@ import { v4 as uuidV4 } from 'uuid'
 import type { InputJsonValue } from '@/generated/prisma/internal/prismaNamespace'
 import { db } from '@/lib/db'
 import { ChatSDKError } from '@/lib/errors'
+import { logger } from '@/lib/logger'
 
 export const getChatById = async (chatId: string) => {
   try {
@@ -15,7 +16,7 @@ export const getChatById = async (chatId: string) => {
 
     return selectedChat
   } catch (error) {
-    console.error('Failed to get chat by id', error)
+    logger.error({ err: error }, 'Failed to get chat by id')
     throw new ChatSDKError('bad_request:database', 'Failed to get chat by id')
   }
 }
@@ -40,7 +41,7 @@ export const saveChat = async ({
 
     return chat
   } catch (error) {
-    console.error('Failed to save chat', error)
+    logger.error({ err: error }, 'Failed to save chat')
     throw new ChatSDKError('bad_request:database', 'Failed to save chat')
   }
 }
@@ -60,7 +61,7 @@ export const updateChatTitleById = async ({
 
     return chat
   } catch (error) {
-    console.error('Failed to update chat title', error)
+    logger.error({ err: error }, 'Failed to update chat title')
     throw new ChatSDKError(
       'bad_request:database',
       'Failed to update chat title',
@@ -115,9 +116,9 @@ export const branchChat = async ({
             chatId: newChatId,
             role: msg.role,
             parts: msg.parts as InputJsonValue,
-            modelId: msg.modelId,
-            totalTokens: msg.totalTokens,
+            metadata: msg.metadata as InputJsonValue,
             createdAt: msg.createdAt,
+            updatedAt: msg.updatedAt,
           })),
         })
       }
@@ -126,7 +127,7 @@ export const branchChat = async ({
     })
   } catch (error) {
     if (error instanceof ChatSDKError) throw error
-    console.error('Failed to branch chat', error)
+    logger.error({ err: error }, 'Failed to branch chat')
     throw new ChatSDKError('bad_request:database', 'Failed to branch chat')
   }
 }

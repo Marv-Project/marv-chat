@@ -2,6 +2,11 @@ import { QueryCache, QueryClient } from '@tanstack/react-query'
 
 const createQueryClient = () =>
   new QueryClient({
+    defaultOptions: {
+      queries: {
+        gcTime: 24 * 60 * 60 * 1000, // 24 hours
+      },
+    },
     queryCache: new QueryCache(),
   })
 

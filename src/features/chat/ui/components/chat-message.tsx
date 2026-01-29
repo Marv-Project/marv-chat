@@ -17,6 +17,8 @@ import {
   ReasoningTrigger,
 } from '@/components/ai-elements/reasoning'
 import { useBranchChat } from '@/hooks/chat/use-branch-chat'
+import { Badge } from '@/components/ui/badge'
+import { getModelName } from '@/lib/ai-sdk/config'
 
 interface MessageProps {
   chatId: string
@@ -70,6 +72,7 @@ export const PreviewMessage = ({
                     key={`${message.id}-${i}`}
                     className="w-full"
                     isStreaming={isLoading}
+                    defaultOpen={false}
                   >
                     <ReasoningTrigger />
                     <ReasoningContent>{part.text}</ReasoningContent>
@@ -145,7 +148,11 @@ const ChatMessageAction = ({
         <MessageAction onClick={handleCopy} label="Copy">
           <CopyIcon className="size-3" />
         </MessageAction>
-        <MessageAction onClick={handleBranch} label="Branch" disabled={isBranching}>
+        <MessageAction
+          onClick={handleBranch}
+          label="Branch"
+          disabled={isBranching}
+        >
           <GitBranchIcon className="size-3" />
         </MessageAction>
       </MessageActions>
@@ -157,12 +164,22 @@ const ChatMessageAction = ({
       <MessageAction onClick={handleCopy} label="Copy">
         <CopyIcon className="size-3" />
       </MessageAction>
-      <MessageAction onClick={handleBranch} label="Branch" disabled={isBranching}>
+      <MessageAction
+        onClick={handleBranch}
+        label="Branch"
+        disabled={isBranching}
+      >
         <GitBranchIcon className="size-3" />
       </MessageAction>
       <MessageAction onClick={() => regenerate()} label="Retry">
         <RefreshCcwIcon className="size-3" />
       </MessageAction>
+
+      {message.metadata && message.metadata.modelId && (
+        <Badge variant="outline">
+          {getModelName(message.metadata.modelId)}
+        </Badge>
+      )}
     </MessageActions>
   )
 }

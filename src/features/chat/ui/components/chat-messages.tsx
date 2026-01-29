@@ -68,7 +68,7 @@ export const Messages = ({
                                 <Source
                                   key={`${message.id}-${i}`}
                                   href={part.url}
-                                  title={part.url}
+                                  title={part.title}
                                 />
                               </SourcesContent>
                             )

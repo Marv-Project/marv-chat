@@ -1,17 +1,5 @@
-import { useLocalStorage } from 'usehooks-ts'
-import { useCallback, useEffect, useRef } from 'react'
-import { GlobeIcon, StopCircleIcon } from 'lucide-react'
-import { toast } from 'sonner'
-import { useNavigate } from '@tanstack/react-router'
-import type { Dispatch, SetStateAction } from 'react'
-import type { UseChatHelpers } from '@ai-sdk/react'
-import type { AppUIMessage } from '@/lib/ai-sdk/types'
 import {
   PromptInput,
-  PromptInputActionAddAttachments,
-  PromptInputActionMenu,
-  PromptInputActionMenuContent,
-  PromptInputActionMenuTrigger,
   PromptInputBody,
   PromptInputButton,
   PromptInputFooter,
@@ -20,6 +8,15 @@ import {
   PromptInputTools,
 } from '@/components/ai-elements/prompt-input'
 import { InputGroupButton } from '@/components/ui/input-group'
+import type { AppUIMessage } from '@/lib/ai-sdk/types'
+import type { UseChatHelpers } from '@ai-sdk/react'
+import { useNavigate } from '@tanstack/react-router'
+import { LoaderIcon, SparklesIcon, StopCircleIcon } from 'lucide-react'
+import type { Dispatch, SetStateAction } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import { useLocalStorage } from 'usehooks-ts'
+import { ChatModelSelector } from './chat-model-selector'
 
 interface MultiModalInputProps {
   chatId: string
@@ -42,7 +39,33 @@ export const MultiModalInput = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const hasHydratedRef = useRef(false)
   const [localStorageInput, setLocalStorageInput] = useLocalStorage('input', '')
+  const [isEnhancing, setIsEnhancing] = useState(false)
   const navigate = useNavigate()
+
+  const handleEnhancePrompt = async () => {
+    if (!input.trim() || isEnhancing) return
+
+    setIsEnhancing(true)
+    try {
+      const response = await fetch('/api/ai/enhance-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: input }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to enhance prompt')
+      }
+
+      const { enhanced } = await response.json()
+      setInput(enhanced)
+      toast.success('Prompt enhanced!')
+    } catch {
+      toast.error('Failed to enhance prompt')
+    } finally {
+      setIsEnhancing(false)
+    }
+  }
 
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(event.target.value)
@@ -110,23 +133,26 @@ export const MultiModalInput = ({
         </PromptInputBody>
         <PromptInputFooter>
           <PromptInputTools>
-            <PromptInputActionMenu>
-              <PromptInputActionMenuTrigger />
-              <PromptInputActionMenuContent>
-                <PromptInputActionAddAttachments />
-              </PromptInputActionMenuContent>
-            </PromptInputActionMenu>
-            <PromptInputButton>
-              <GlobeIcon size={16} />
-              <span>Search</span>
+            <ChatModelSelector />
+
+            <PromptInputButton
+              onClick={handleEnhancePrompt}
+              disabled={!input.trim() || isEnhancing}
+            >
+              {isEnhancing ? (
+                <LoaderIcon size={16} className="animate-spin" />
+              ) : (
+                <SparklesIcon size={16} />
+              )}
+              <span>{isEnhancing ? 'Enhancing...' : 'Enhance'}</span>
             </PromptInputButton>
           </PromptInputTools>
 
-          {status === 'submitted' ? (
+          {status === 'streaming' ? (
             <StopButton stop={stop} />
           ) : (
             <PromptInputSubmit
-              disabled={!input || status === 'streaming' || !input.trim()}
+              disabled={!input || status === 'submitted' || !input.trim()}
               status={status}
             />
           )}

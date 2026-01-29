@@ -1,20 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { formatISO } from 'date-fns'
-import { v4 as uuidV4 } from 'uuid'
-import {
-  JsonToSseTransformStream,
-  convertToModelMessages,
-  createUIMessageStream,
-  smoothStream,
-  stepCountIs,
-  streamText,
-  validateUIMessages,
-} from 'ai'
-import type { PostRequestBodySchema } from '@/schemas/api.schema'
-import type { AppUIMessage } from '@/lib/ai-sdk/types'
-import { authMiddleware } from '@/middlewares/auth'
-import { postRequestBodySchema } from '@/schemas/api.schema'
-import { ChatSDKError } from '@/lib/errors'
+import { getLanguageModel } from '@/lib/ai-sdk/config'
+import { type AppUIMessage } from '@/lib/ai-sdk/types'
+import { generateTitleFromUserMessage } from '@/lib/ai-sdk/utils'
 import {
   getChatById,
   saveChat,
@@ -24,26 +10,46 @@ import {
   getMessagesByChatId,
   saveMessages,
 } from '@/lib/db/queries/message.query'
-import { generateTitleFromUserMessage } from '@/lib/ai-sdk/utils'
 import { createStreamId } from '@/lib/db/queries/stream.query'
-import { registry } from '@/lib/ai-sdk/registry'
+import { ChatSDKError } from '@/lib/errors'
+import { logger } from '@/lib/logger'
+import { authMiddleware } from '@/middlewares/auth'
+import type { PostRequestBodySchema } from '@/schemas/api.schema'
+import { postRequestBodySchema } from '@/schemas/api.schema'
+import { createFileRoute } from '@tanstack/react-router'
+import {
+  convertToModelMessages,
+  createUIMessageStream,
+  JsonToSseTransformStream,
+  smoothStream,
+  stepCountIs,
+  streamText,
+  validateUIMessages,
+} from 'ai'
+import { v4 as uuidV4 } from 'uuid'
 
 export const Route = createFileRoute('/api/ai/chat')({
   server: {
     middleware: [authMiddleware],
     handlers: {
       POST: async ({ request, context }) => {
+        logger.info(
+          { method: 'POST', path: '/api/ai/chat' },
+          'Request received',
+        )
+
         let requestBody: PostRequestBodySchema
         try {
           const json = await request.json()
           requestBody = postRequestBodySchema.parse(json)
         } catch (error) {
-          console.log('Invalid request body', error)
+          logger.warn({ err: error }, 'Invalid request body')
           return new ChatSDKError('bad_request:api').toResponse()
         }
 
         try {
-          const { id, message } = requestBody
+          const { id, message, modelId } = requestBody
+          logger.info({ modelId }, 'Request model ID')
 
           if (!context.auth) {
             return new ChatSDKError('unauthorized:chat').toResponse()
@@ -73,9 +79,7 @@ export const Route = createFileRoute('/api/ai/chat')({
             id: m.id,
             role: m.role as 'user' | 'assistant' | 'system',
             parts: m.parts as AppUIMessage['parts'],
-            metadata: {
-              createdAt: formatISO(m.createdAt),
-            },
+            metadata: m.metadata as AppUIMessage['metadata'],
           }))
           const messages = [...mapUIMessages, message]
           const validatedMessages = await validateUIMessages({
@@ -91,6 +95,7 @@ export const Route = createFileRoute('/api/ai/chat')({
                   chatId: id,
                   role: 'user',
                   parts: JSON.parse(JSON.stringify(message.parts)),
+                  metadata: message.metadata,
                 },
               ],
             })
@@ -98,8 +103,6 @@ export const Route = createFileRoute('/api/ai/chat')({
 
           const streamId = uuidV4()
           await createStreamId({ chatId: id, streamId })
-
-          const modelId = 'ollama:gpt-oss:120b' as const
 
           const stream = createUIMessageStream({
             originalMessages: messages,
@@ -116,12 +119,15 @@ export const Route = createFileRoute('/api/ai/chat')({
                     })
                   })
                   .catch((error) => {
-                    console.error('Failed to update chat title:', error)
+                    logger.error(
+                      { err: error, chatId: id },
+                      'Failed to update chat title',
+                    )
                   })
               }
 
               const result = streamText({
-                model: registry.languageModel(modelId),
+                model: getLanguageModel(modelId),
                 messages: await convertToModelMessages(validatedMessages),
                 stopWhen: stepCountIs(5),
                 experimental_transform: smoothStream({
@@ -137,9 +143,15 @@ export const Route = createFileRoute('/api/ai/chat')({
                   sendReasoning: true,
                   sendSources: true,
                   messageMetadata: ({ part }) => {
-                    if (part.type === 'finish') {
-                      console.log('total tokens:', part.totalUsage.totalTokens)
+                    if (part.type === 'start') {
                       return {
+                        createdAt: new Date(),
+                      }
+                    }
+
+                    if (part.type === 'finish') {
+                      return {
+                        modelId,
                         totalTokens: part.totalUsage.totalTokens,
                       }
                     }
@@ -156,17 +168,13 @@ export const Route = createFileRoute('/api/ai/chat')({
                     chatId: id,
                     role: currentMessage.role,
                     parts: JSON.parse(JSON.stringify(currentMessage.parts)),
-                    modelId:
-                      currentMessage.role === 'assistant' ? modelId : null,
-                    totalTokens: currentMessage.metadata?.totalTokens ?? null,
+                    metadata: currentMessage.metadata,
                   })),
                 })
               }
             },
             onError: () => {
-              console.log(
-                'Oops, an error occurred while generating the response. Please try again.',
-              )
+              logger.error('Stream generation error')
               return 'Oops, an error occurred while generating the response. Please try again.'
             },
           })
@@ -186,7 +194,7 @@ export const Route = createFileRoute('/api/ai/chat')({
             return error.toResponse()
           }
 
-          console.log('Unhandled error in chat API', error)
+          logger.error({ err: error }, 'Unhandled error in chat API')
           return new ChatSDKError('offline:chat').toResponse()
         }
       },

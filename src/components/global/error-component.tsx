@@ -35,8 +35,8 @@ export const ErrorComponent = ({ error }: ErrorComponentProps) => {
   }, [queryClientErrorBoundary])
 
   return (
-    <div className="from-muted/50 to-background h-svh bg-linear-to-b from-30%">
-      <div className="container grid h-full max-w-xl items-center justify-center">
+    <div className="from-muted/50 to-background h-svh w-full bg-linear-to-b from-30%">
+      <div className="container grid h-full w-full max-w-xl items-center justify-center">
         <Empty className="h-fit">
           <EmptyHeader>
             <EmptyMedia variant="icon" className="text-destructive">

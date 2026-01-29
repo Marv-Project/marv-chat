@@ -6,6 +6,8 @@ import { getQueryClient } from '@/lib/query-client'
 import { orpc } from '@/orpc/client'
 // Import the generated route tree
 import { routeTree } from '@/routeTree.gen'
+import { NotFoundComponent } from './components/global/not-found-component'
+import { ErrorComponent } from './components/global/error-component'
 
 // Create a new router instance
 export const getRouter = () => {
@@ -24,6 +26,8 @@ export const getRouter = () => {
         </AppQueryProvider>
       )
     },
+    defaultNotFoundComponent: NotFoundComponent,
+    defaultErrorComponent: (error) => <ErrorComponent {...error} />,
   })
 
   setupRouterSsrQueryIntegration({ router, queryClient })

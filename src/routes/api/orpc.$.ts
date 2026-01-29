@@ -7,11 +7,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { SmartCoercionPlugin } from '@orpc/json-schema'
 import { orpcRouter } from '@/orpc/routers'
 import { createORPCContext } from '@/orpc/context'
+import { logger } from '@/lib/logger'
 
 const rpcHandler = new RPCHandler(orpcRouter, {
   interceptors: [
     onError((error) => {
-      console.error(error)
+      logger.error({ err: error }, 'oRPC handler error')
     }),
   ],
 })
@@ -19,7 +20,7 @@ const rpcHandler = new RPCHandler(orpcRouter, {
 const apiHandler = new OpenAPIHandler(orpcRouter, {
   interceptors: [
     onError((error) => {
-      console.error(error)
+      logger.error({ err: error }, 'oRPC handler error')
     }),
   ],
 
@@ -73,6 +74,7 @@ const createContext = async (req: Request) => {
 }
 
 async function handle({ request }: { request: Request }) {
+  logger.info({ method: request.method, path: new URL(request.url).pathname }, 'Request received')
   const context = await createContext(request)
 
   const rpcResult = await rpcHandler.handle(request, {
