@@ -60,5 +60,4 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 24 * 3,
   },
-  trustedOrigins: [env.VITE_APP_URL],
 })

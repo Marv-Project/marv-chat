@@ -1,12 +1,7 @@
-import { PrismaNeon } from '@prisma/adapter-neon'
-import { neonConfig } from '@neondatabase/serverless'
-import ws from 'ws'
 import { env } from '@/configs/env'
 import { PrismaClient } from '@/generated/prisma/client'
+import { PrismaNeon } from '@prisma/adapter-neon'
 import { PrismaPg } from '@prisma/adapter-pg'
-
-neonConfig.webSocketConstructor = ws
-neonConfig.poolQueryViaFetch = true
 
 const adapter =
   env.NODE_ENV === 'development'
