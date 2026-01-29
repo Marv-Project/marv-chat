@@ -21,5 +21,5 @@ export const registry = createProviderRegistry(
     ollama,
     openrouter,
   },
-  { separator: ':' },
+  { separator: '::' },
 )

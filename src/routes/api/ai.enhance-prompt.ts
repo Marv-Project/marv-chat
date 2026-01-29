@@ -39,7 +39,7 @@ export const Route = createFileRoute('/api/ai/enhance-prompt')({
 
           const { text: enhanced } = await generateText({
             model: registry.languageModel(
-              'openrouter:deepseek/deepseek-r1-0528:free',
+              'openrouter::deepseek/deepseek-r1-0528:free',
             ),
             system: enhancePromptSystem,
             prompt: `Enhance this prompt:\n\n${prompt}`,

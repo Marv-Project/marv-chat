@@ -116,9 +116,9 @@ export const branchChat = async ({
             chatId: newChatId,
             role: msg.role,
             parts: msg.parts as InputJsonValue,
-            modelId: msg.modelId,
-            totalTokens: msg.totalTokens,
+            metadata: msg.metadata as InputJsonValue,
             createdAt: msg.createdAt,
+            updatedAt: msg.updatedAt,
           })),
         })
       }

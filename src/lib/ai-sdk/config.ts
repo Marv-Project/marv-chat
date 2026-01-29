@@ -82,13 +82,14 @@ export const getLanguageModel = (modelId: string) => {
   const providerId = providerLookup.get(modelId)
   if (!providerId) throw new Error(`Unknown model ID: ${modelId}`)
   return registry.languageModel(
-    `${providerId}:${modelId}` as `${AIProvider}:${string}`,
+    `${providerId}::${modelId}` as `${AIProvider}::${string}`,
   )
 }
 
 export const getModelName = (modelId: string): string => {
   const providerId = providerLookup.get(modelId)
-  if (!providerId) throw new Error(`Unknown model ID: ${modelId}`)
+  if (!providerId) return modelId
+
   return (
     AI_MODELS_CONFIG.find((p) => p.id === providerId)?.models.find(
       (m) => m.id === modelId,

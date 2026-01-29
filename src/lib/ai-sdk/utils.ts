@@ -30,7 +30,7 @@ export const generateTitleFromUserMessage = async ({
 
   try {
     const { text: title } = await generateText({
-      model: registry.languageModel('ollama:gpt-oss:120b'),
+      model: registry.languageModel('ollama::gpt-oss:120b'),
       system: titlePrompt,
       prompt,
     })
