@@ -16,7 +16,6 @@ import { logger } from '@/lib/logger'
 import { authMiddleware } from '@/middlewares/auth'
 import type { PostRequestBodySchema } from '@/schemas/api.schema'
 import { postRequestBodySchema } from '@/schemas/api.schema'
-import { GoogleGenerativeAIProviderOptions } from '@ai-sdk/google'
 import { createFileRoute } from '@tanstack/react-router'
 import {
   convertToModelMessages,
@@ -135,14 +134,6 @@ export const Route = createFileRoute('/api/ai/chat')({
                   delayInMs: 20,
                   chunking: 'word',
                 }),
-                providerOptions: {
-                  google: {
-                    thinkingConfig: {
-                      thinkingBudget: 8192,
-                      includeThoughts: true,
-                    },
-                  } satisfies GoogleGenerativeAIProviderOptions,
-                },
               })
 
               result.consumeStream()

@@ -17,6 +17,8 @@ import {
   ReasoningTrigger,
 } from '@/components/ai-elements/reasoning'
 import { useBranchChat } from '@/hooks/chat/use-branch-chat'
+import { Badge } from '@/components/ui/badge'
+import { getModelName } from '@/lib/ai-sdk/config'
 
 interface MessageProps {
   chatId: string
@@ -172,6 +174,12 @@ const ChatMessageAction = ({
       <MessageAction onClick={() => regenerate()} label="Retry">
         <RefreshCcwIcon className="size-3" />
       </MessageAction>
+
+      {message.metadata && message.metadata.modelId && (
+        <Badge variant="outline">
+          {getModelName(message.metadata.modelId)}
+        </Badge>
+      )}
     </MessageActions>
   )
 }
