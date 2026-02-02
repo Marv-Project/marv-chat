@@ -16,6 +16,7 @@ import * as schema from '@/lib/db/schemas/auth'
 import { db } from '@/lib/db'
 import { faker } from '@faker-js/faker'
 import { generateNanoId } from '@/lib/nanoid'
+import { z } from 'zod'
 
 export const auth = betterAuth({
   appName: env.APP_NAME,
@@ -41,6 +42,11 @@ export const auth = betterAuth({
   },
   hooks: {
     before: createAuthMiddleware(async (ctx) => {
+      // Only modify body for sign-in paths
+      if (!ctx.path.startsWith('/sign-in')) {
+        return { context: ctx }
+      }
+
       if (ctx.path === '/sign-in/anonymous') {
         return {
           context: {
@@ -101,10 +107,13 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       type: {
-        type: ['guest', 'registered'] as schema.UserTypeEnum[],
+        type: 'string',
         required: true,
         defaultValue: 'guest',
         input: false,
+        validator: {
+          input: z.enum(['guest', 'registered']),
+        },
       },
     },
   },

@@ -13,7 +13,10 @@ export const userRoleEnum = pgEnum('user_role', ['user', 'admin'])
 export const userTypeEnum = pgEnum('user_type', ['guest', 'registered'])
 
 export const userTable = pgTable('user', {
-  id: text('id').primaryKey().notNull().default(uuidv4()),
+  id: text('id')
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => uuidv4()),
   name: text('name').notNull(),
   username: text('username').unique(),
   displayUsername: text('display_username'),
@@ -26,7 +29,7 @@ export const userTable = pgTable('user', {
   banned: boolean('banned').default(false),
   banReason: text('ban_reason'),
   banExpires: timestamp('ban_expires'),
-  createdAt: timestamp('created_at').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at')
     .$onUpdate(() => new Date())
     .notNull(),
@@ -35,13 +38,16 @@ export const userTable = pgTable('user', {
 export const sessionTable = pgTable(
   'session',
   {
-    id: text('id').primaryKey().notNull().default(uuidv4()),
+    id: text('id')
+      .primaryKey()
+      .notNull()
+      .$defaultFn(() => uuidv4()),
     userId: text('user_id')
       .notNull()
       .references(() => userTable.id, { onDelete: 'cascade' }),
     expiresAt: timestamp('expires_at').notNull(),
     token: text('token').notNull().unique(),
-    createdAt: timestamp('created_at').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at')
       .$onUpdate(() => new Date())
       .notNull(),
@@ -55,7 +61,10 @@ export const sessionTable = pgTable(
 export const accountTable = pgTable(
   'account',
   {
-    id: text('id').primaryKey().notNull().default(uuidv4()),
+    id: text('id')
+      .primaryKey()
+      .notNull()
+      .$defaultFn(() => uuidv4()),
     accountId: text('account_id').notNull(),
     providerId: text('provider_id').notNull(),
     userId: text('user_id')
@@ -68,7 +77,7 @@ export const accountTable = pgTable(
     refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
     scope: text('scope'),
     password: text('password'),
-    createdAt: timestamp('created_at').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at')
       .$onUpdate(() => new Date())
       .notNull(),
@@ -79,11 +88,14 @@ export const accountTable = pgTable(
 export const verificationTable = pgTable(
   'verification',
   {
-    id: text('id').primaryKey().notNull().default(uuidv4()),
+    id: text('id')
+      .primaryKey()
+      .notNull()
+      .$defaultFn(() => uuidv4()),
     identifier: text('identifier').notNull(),
     value: text('value').notNull(),
     expiresAt: timestamp('expires_at').notNull(),
-    createdAt: timestamp('created_at').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at')
       .$onUpdate(() => new Date())
       .notNull(),
@@ -92,10 +104,13 @@ export const verificationTable = pgTable(
 )
 
 export const jwks = pgTable('jwks', {
-  id: text('id').primaryKey().notNull().default(uuidv4()),
+  id: text('id')
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => uuidv4()),
   publicKey: text('public_key').notNull(),
   privateKey: text('private_key').notNull(),
-  createdAt: timestamp('created_at').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
   expiresAt: timestamp('expires_at'),
 })
 
