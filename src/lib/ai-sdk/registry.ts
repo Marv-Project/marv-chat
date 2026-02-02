@@ -1,7 +1,7 @@
 import { createOllama } from 'ollama-ai-provider-v2'
 import { createProviderRegistry } from 'ai'
 import { google } from '@/lib/ai-sdk/providers'
-import { env } from '@/configs/env'
+import { env } from '@/lib/env/server'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
 
 export const ollama = createOllama({

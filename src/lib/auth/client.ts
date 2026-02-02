@@ -6,8 +6,8 @@ import {
   multiSessionClient,
   usernameClient,
 } from 'better-auth/client/plugins'
-import type { auth } from '@/lib/auth'
-import { env } from '@/configs/env'
+import type { auth } from '@/lib/auth/server'
+import { env } from '@/lib/env/client'
 
 export const authClient = createAuthClient({
   baseURL: env.VITE_APP_URL,

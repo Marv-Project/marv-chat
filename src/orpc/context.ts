@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { auth } from '@/lib/auth'
+import { auth } from '@/lib/auth/server'
 
 export const createORPCContext = async (opts: { headers: Headers }) => {
   const session = await auth.api.getSession({
