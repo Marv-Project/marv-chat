@@ -1,4 +1,4 @@
-import { env } from '@/configs/env'
+import { env } from '@/lib/env/client'
 
 /**
  * Trusted origins for redirect validation.

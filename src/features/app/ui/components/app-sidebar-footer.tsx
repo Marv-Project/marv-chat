@@ -5,7 +5,7 @@ import {
 } from '@tabler/icons-react'
 import { useRouter } from '@tanstack/react-router'
 import { ChevronsUpDown, LogOutIcon } from 'lucide-react'
-import type { auth } from '@/lib/auth'
+import type { auth } from '@/lib/auth/server'
 import { AvatarUser } from '@/components/global/avatar-user'
 import { Button } from '@/components/ui/button'
 import {

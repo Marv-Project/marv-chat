@@ -1,4 +1,4 @@
-import type { auth } from '@/lib/auth'
+import type { auth } from '@/lib/auth/server'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { GeneratedAvatar } from '@/components/global/generated-avatar'
 

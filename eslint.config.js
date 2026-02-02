@@ -2,17 +2,11 @@
 
 import { tanstackConfig } from '@tanstack/eslint-config'
 import { defineConfig } from 'eslint/config'
-import tseslint from 'typescript-eslint'
 
 export default defineConfig([
   ...tanstackConfig,
   {
     files: ['**/*.ts', '**/*.tsx'],
-    extends: [
-      ...tseslint.configs.recommended,
-      ...tseslint.configs.recommendedTypeChecked,
-      ...tseslint.configs.stylisticTypeChecked,
-    ],
     rules: {
       '@typescript-eslint/array-type': 'off',
       '@typescript-eslint/consistent-type-definitions': 'off',
