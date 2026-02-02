@@ -11,12 +11,12 @@ import {
   username as usernamePlugin,
 } from 'better-auth/plugins'
 import { tanstackStartCookies } from 'better-auth/tanstack-start'
+import { faker } from '@faker-js/faker'
+import { z } from 'zod'
 import { env } from '@/lib/env/server'
 import * as schema from '@/lib/db/schemas/auth'
 import { db } from '@/lib/db'
-import { faker } from '@faker-js/faker'
 import { generateNanoId } from '@/lib/nanoid'
-import { z } from 'zod'
 
 export const auth = betterAuth({
   appName: env.APP_NAME,
@@ -52,7 +52,7 @@ export const auth = betterAuth({
           context: {
             ...ctx,
             body: {
-              ...ctx.body,
+              ...(ctx.body ?? {}),
               type: 'guest' as schema.UserTypeEnum,
             },
           },
@@ -63,7 +63,7 @@ export const auth = betterAuth({
         context: {
           ...ctx,
           body: {
-            ...ctx.body,
+            ...(ctx.body ?? {}),
             type: 'registered' as schema.UserTypeEnum,
           },
         },
