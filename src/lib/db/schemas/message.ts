@@ -10,6 +10,8 @@ import { threadTable } from './thread'
 import type { InferSelectModel } from 'drizzle-orm'
 import type { MessageMetadata } from '@/lib/ai-sdk/types'
 
+type MessagePart = Record<string, any>
+
 export const messageRoleEnum = pgEnum('message_role', [
   'user',
   'assistant',
@@ -24,7 +26,7 @@ export const messageTable = pgTable(
       .notNull()
       .references(() => threadTable.id, { onDelete: 'cascade' }),
     role: messageRoleEnum('role').notNull(),
-    parts: json('parts').$type<any[]>().notNull(),
+    parts: json('parts').$type<MessagePart[]>().notNull(),
     metadata: json('metadata').$type<MessageMetadata | null>(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at')
