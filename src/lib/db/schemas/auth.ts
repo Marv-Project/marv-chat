@@ -95,7 +95,7 @@ export const verificationTable = pgTable(
   (table) => [index('verification_identifier_idx').on(table.identifier)],
 )
 
-export const jwks = pgTable('jwks', {
+export const jwksTable = pgTable('jwks', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
   publicKey: text('public_key').notNull(),
   privateKey: text('private_key').notNull(),

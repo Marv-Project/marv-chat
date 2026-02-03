@@ -3,6 +3,7 @@ import {
   foreignKey,
   integer,
   pgTable,
+  text,
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core'
@@ -15,6 +16,7 @@ export const threadTable = pgTable(
     userId: uuid('user_id')
       .notNull()
       .references(() => userTable.id, { onDelete: 'cascade' }),
+    title: text('title'),
     isPinned: boolean('is_pinned').notNull().default(false),
     branchedFromThreadId: uuid('branched_from_thread_id'),
     branchedAtMessageIndex: integer('branched_at_message_index'),

@@ -74,7 +74,10 @@ const createContext = async (req: Request) => {
 }
 
 async function handle({ request }: { request: Request }) {
-  logger.info({ method: request.method, path: new URL(request.url).pathname }, 'Request received')
+  logger.info(
+    { method: request.method, path: new URL(request.url).pathname },
+    'Request received',
+  )
   const context = await createContext(request)
 
   const rpcResult = await rpcHandler.handle(request, {

@@ -1,11 +1,11 @@
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/features/app/ui/components/app-sidebar'
 import {
   Outlet,
   createFileRoute,
   redirect,
   useParams,
 } from '@tanstack/react-router'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { AppSidebar } from '@/features/app/ui/components/app-sidebar'
 
 export const Route = createFileRoute('/_app')({
   component: App,

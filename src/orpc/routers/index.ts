@@ -4,15 +4,21 @@ import type {
   RouterClient,
 } from '@orpc/server'
 import { getAllMessages } from '@/orpc/routers/message'
-import { branchChat, deleteChat, getAllChat, renameChat, togglePinChat } from '@/orpc/routers/chat'
+import {
+  branchThread,
+  deleteThread,
+  getThreads,
+  renameThread,
+  togglePinThread,
+} from '@/orpc/routers/thread'
 
 export const orpcRouter = {
-  chats: {
-    getAll: getAllChat,
-    delete: deleteChat,
-    rename: renameChat,
-    togglePin: togglePinChat,
-    branch: branchChat,
+  threads: {
+    getAll: getThreads,
+    delete: deleteThread,
+    rename: renameThread,
+    togglePin: togglePinThread,
+    branch: branchThread,
   },
 
   messages: {
