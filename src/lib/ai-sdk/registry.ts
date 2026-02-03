@@ -1,18 +1,17 @@
 import { createOllama } from 'ollama-ai-provider-v2'
 import { createProviderRegistry } from 'ai'
-import { google } from '@/lib/ai-sdk/providers'
-import { env } from '@/lib/env/server'
 import { createOpenRouter } from '@openrouter/ai-sdk-provider'
+import { google } from '@/lib/ai-sdk/providers'
 
 export const ollama = createOllama({
   baseURL: 'https://ollama.com/api',
   headers: {
-    Authorization: `Bearer ${env.OLLAMA_API_KEY}`,
+    Authorization: `Bearer ${process.env.OLLAMA_API_KEY}`,
   },
 })
 
 export const openrouter = createOpenRouter({
-  apiKey: env.OPENROUTER_API_KEY,
+  apiKey: process.env.OPENROUTER_API_KEY,
 })
 
 export const registry = createProviderRegistry(
