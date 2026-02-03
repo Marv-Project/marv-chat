@@ -35,11 +35,11 @@ import {
 } from '@/components/ui/sidebar'
 import { DeleteChatDialog } from '@/features/app/ui/components/delete-chat-dialog'
 import { RenameChatDialog } from '@/features/app/ui/components/rename-chat-dialog'
-import { useGroupedChats } from '@/hooks/chat/use-grouped-chats'
-import { useTogglePinChat } from '@/hooks/chat/use-toggle-pin-chat'
+import { useGroupedThreads } from '@/hooks/thread/use-grouped-thread'
+import { useTogglePinThread } from '@/hooks/thread/use-toggle-pin-thread'
 
 interface AppSidebarContentProps {
-  items: RouterOutputs['chats']['getAll']
+  items: RouterOutputs['threads']['getMany']
   activeChatId?: string
 }
 
@@ -55,27 +55,30 @@ export const AppSidebarContent = ({
     title: string
   } | null>(null)
 
-  const { mutate: togglePin } = useTogglePinChat()
+  const { mutate: togglePin } = useTogglePinThread()
 
   // Separate pinned and non-pinned chats
-  const pinnedChats = items.filter((item) => item.pinned)
-  const unpinnedChats = items.filter((item) => !item.pinned)
+  const pinnedThreads = items.filter((item) => item.isPinned)
+  const unpinnedThreads = items.filter((item) => !item.isPinned)
 
   // Group only non-pinned chats by time periods
-  const { groupedChats, periodsWithChats } = useGroupedChats(unpinnedChats)
+  const { groupedThreads, periodsWithThreads } =
+    useGroupedThreads(unpinnedThreads)
 
-  const handleRenameClick = (chatId: string, chatTitle: string) => {
-    setSelectedChat({ id: chatId, title: chatTitle })
+  const handleRenameClick = (threadId: string, threadTitle: string) => {
+    setSelectedChat({ id: threadId, title: threadTitle })
     setRenameDialogOpen(true)
   }
 
-  const handleDeleteClick = (chatId: string, chatTitle: string) => {
-    setSelectedChat({ id: chatId, title: chatTitle })
+  const handleDeleteClick = (threadId: string, threadTitle: string) => {
+    setSelectedChat({ id: threadId, title: threadTitle })
     setDeleteDialogOpen(true)
   }
 
   // Render a single chat item with all interactions
-  const renderChatItem = (item: RouterOutputs['chats']['getAll'][number]) => (
+  const renderChatItem = (
+    item: RouterOutputs['threads']['getMany'][number],
+  ) => (
     <SidebarMenuItem key={item.id}>
       <AppTooltip content={item.title} side="bottom">
         <SidebarMenuButton isActive={item.id === activeChatId} asChild>
@@ -85,7 +88,7 @@ export const AppSidebarContent = ({
             viewTransition
             className="pl-4 text-sm"
           >
-            {item.branchedFromId && (
+            {item.branchedFromThreadId && (
               <GitBranchIcon className="text-muted-foreground size-3 shrink-0" />
             )}
             <span>{item.title}</span>
@@ -109,9 +112,9 @@ export const AppSidebarContent = ({
           align={isMobile ? 'end' : 'start'}
           sideOffset={isMobile ? 10 : 20}
         >
-          <DropdownMenuItem onClick={() => togglePin({ chatId: item.id })}>
-            {item.pinned ? <PinOffIcon /> : <PinIcon />}
-            <span>{item.pinned ? 'Unpin' : 'Pin'}</span>
+          <DropdownMenuItem onClick={() => togglePin({ threadId: item.id })}>
+            {item.isPinned ? <PinOffIcon /> : <PinIcon />}
+            <span>{item.isPinned ? 'Unpin' : 'Pin'}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => handleRenameClick(item.id, item.title)}
@@ -154,7 +157,7 @@ export const AppSidebarContent = ({
       )}
 
       <SidebarContent className="mt-2">
-        {pinnedChats.length > 0 && (
+        {pinnedThreads.length > 0 && (
           <Collapsible defaultOpen className="group/collapsible">
             <SidebarGroup className="py-0 group-data-[collapsible=icon]:hidden">
               <SidebarGroupLabel asChild>
@@ -166,13 +169,13 @@ export const AppSidebarContent = ({
               </SidebarGroupLabel>
 
               <CollapsibleContent>
-                <SidebarMenu>{pinnedChats.map(renderChatItem)}</SidebarMenu>
+                <SidebarMenu>{pinnedThreads.map(renderChatItem)}</SidebarMenu>
               </CollapsibleContent>
             </SidebarGroup>
           </Collapsible>
         )}
 
-        {periodsWithChats.map((period) => (
+        {periodsWithThreads.map((period) => (
           <SidebarGroup
             key={period}
             className="py-0 group-data-[collapsible=icon]:hidden"
@@ -180,7 +183,7 @@ export const AppSidebarContent = ({
             <SidebarGroupLabel>{period}</SidebarGroupLabel>
 
             <SidebarMenu>
-              {groupedChats[period].map(renderChatItem)}
+              {groupedThreads[period].map(renderChatItem)}
             </SidebarMenu>
           </SidebarGroup>
         ))}

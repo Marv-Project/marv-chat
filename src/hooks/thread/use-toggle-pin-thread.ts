@@ -2,15 +2,15 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { orpc } from '@/orpc/client'
 
-export const useTogglePinChat = () => {
+export const useTogglePinThread = () => {
   const queryClient = useQueryClient()
 
   return useMutation(
-    orpc.chats.togglePin.mutationOptions({
+    orpc.threads.togglePin.mutationOptions({
       onSuccess: (data) => {
-        void queryClient.invalidateQueries(orpc.chats.getAll.queryOptions())
+        void queryClient.invalidateQueries(orpc.threads.getMany.queryOptions())
 
-        toast.success(data.pinned ? 'Chat pinned' : 'Chat unpinned')
+        toast.success(data.isPinned ? 'Thread pinned' : 'Thread unpinned')
       },
 
       onError: (error) => {

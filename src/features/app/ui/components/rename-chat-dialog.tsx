@@ -11,7 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { useRenameChat } from '@/hooks/chat/use-rename-chat'
+import { useRenameThread } from '@/hooks/thread/use-rename-thread'
 import {
   Field,
   FieldError,
@@ -38,7 +38,7 @@ export function RenameChatDialog({
   open,
   onOpenChange,
 }: RenameChatDialogProps) {
-  const { mutate, isPending } = useRenameChat()
+  const { mutate, isPending } = useRenameThread()
 
   const form = useForm({
     defaultValues: {
@@ -50,7 +50,7 @@ export function RenameChatDialog({
     },
     onSubmit: ({ value }) => {
       mutate(
-        { chatId, title: value.title },
+        { threadId: chatId, title: value.title },
         {
           onSuccess: () => {
             onOpenChange(false)

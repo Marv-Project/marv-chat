@@ -3,10 +3,11 @@ import type {
   InferRouterOutputs,
   RouterClient,
 } from '@orpc/server'
-import { getAllMessages } from '@/orpc/routers/message'
+import { getMessages } from '@/orpc/routers/message'
 import {
   branchThread,
   deleteThread,
+  getThread,
   getThreads,
   renameThread,
   togglePinThread,
@@ -14,7 +15,8 @@ import {
 
 export const orpcRouter = {
   threads: {
-    getAll: getThreads,
+    getMany: getThreads,
+    getOne: getThread,
     delete: deleteThread,
     rename: renameThread,
     togglePin: togglePinThread,
@@ -22,7 +24,7 @@ export const orpcRouter = {
   },
 
   messages: {
-    getAll: getAllMessages,
+    getMany: getMessages,
   },
 }
 

@@ -1,4 +1,4 @@
-import { and, desc, eq } from 'drizzle-orm'
+import { and, desc, eq, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { ORPCError } from '@orpc/server'
 import { db } from '@/lib/db'
@@ -92,9 +92,19 @@ export const togglePinThread = protectedProcedure
 
     const [updatedThread] = await db
       .update(threadTable)
-      .set({ isPinned: !thread.isPinned })
-      .where(eq(threadTable.id, input.threadId))
+      .set({ isPinned: sql`NOT ${threadTable.isPinned}` })
+      .where(
+        and(
+          eq(threadTable.id, input.threadId),
+          eq(threadTable.userId, context.auth.user.id),
+        ),
+      )
       .returning()
+    if (!updatedThread) {
+      throw new ORPCError('NOT_FOUND', {
+        message: 'Thread not found',
+      })
+    }
 
     return updatedThread
   })
@@ -127,7 +137,7 @@ export const deleteThread = protectedProcedure
 
 export const branchThread = protectedProcedure
   .input(
-    z.object({ threadId: z.string(), messageIndex: z.number().int().min(0) }),
+    z.object({ threadId: z.uuid(), messageIndex: z.number().int().min(0) }),
   )
   .handler(async ({ context, input }) => {
     const [thread] = await db

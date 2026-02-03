@@ -112,7 +112,9 @@ export const branchThread = async ({
         .values({
           id: newThreadId,
           userId,
-          title: `${sourceThread.title} (Branch)`,
+          title: sourceThread.title
+            ? `${sourceThread.title} (Branch)`
+            : 'Branch',
           branchedFromThreadId: sourceThreadId,
           branchedAtMessageIndex: messageIndex,
         })
