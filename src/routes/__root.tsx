@@ -8,12 +8,12 @@ import {
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 
+import type { orpc } from '@/orpc/client'
+import type { QueryClient } from '@tanstack/react-query'
+import appCss from '@/styles.css?url'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { Toaster } from '@/components/ui/sonner'
 import { getAuthFn } from '@/functions/get-auth-fn'
-import type { orpc } from '@/orpc/client'
-import type { QueryClient } from '@tanstack/react-query'
-import appCss from '../styles.css?url'
 
 interface MyRouterContext {
   orpc: typeof orpc
@@ -43,6 +43,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   }),
   beforeLoad: async () => {
     const auth = await getAuthFn()
+
     return { auth }
   },
   component: RootComponent,

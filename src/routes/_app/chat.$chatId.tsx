@@ -8,7 +8,9 @@ export const Route = createFileRoute('/_app/chat/$chatId')({
   validateSearch: chatIdRouterValidator,
   loader: ({ context: { orpc, queryClient }, params }) => {
     return queryClient.ensureQueryData(
-      orpc.messages.getAll.queryOptions({ input: { chatId: params.chatId } }),
+      orpc.messages.getMany.queryOptions({
+        input: { threadId: params.chatId },
+      }),
     )
   },
 })

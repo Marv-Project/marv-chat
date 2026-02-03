@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Spinner } from '@/components/ui/spinner'
-import { useDeleteChat } from '@/hooks/chat/use-delete-chat'
+import { useDeleteThread } from '@/hooks/thread/use-delete-thread'
 
 interface DeleteChatDialogProps {
   chatId: string
@@ -30,11 +30,11 @@ export const DeleteChatDialog = ({
   onOpenChange,
 }: DeleteChatDialogProps) => {
   const router = useRouter()
-  const { mutate, isPending } = useDeleteChat()
+  const { mutate, isPending } = useDeleteThread()
 
   const handleDelete = () => {
     mutate(
-      { chatId },
+      { threadId: chatId },
       {
         onSuccess: () => {
           onOpenChange(false)

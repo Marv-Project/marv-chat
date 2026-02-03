@@ -1,6 +1,6 @@
+import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 import { validateCallbackUrl } from '@/lib/validate-callback-url'
 import { loginRouterValidator } from '@/schemas/router.schema'
-import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_auth')({
   component: Auth,

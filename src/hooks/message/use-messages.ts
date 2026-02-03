@@ -2,9 +2,9 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import type { AppUIMessage } from '@/lib/ai-sdk/types'
 import { orpc } from '@/orpc/client'
 
-export const useMessages = (chatId: string) => {
+export const useMessages = (threadId: string) => {
   const messages = useSuspenseQuery(
-    orpc.messages.getAll.queryOptions({ input: { chatId } }),
+    orpc.messages.getMany.queryOptions({ input: { threadId } }),
   )
 
   const data = messages.data.map((m) => ({

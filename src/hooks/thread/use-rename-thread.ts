@@ -2,19 +2,19 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { orpc } from '@/orpc/client'
 
-export const useRenameChat = () => {
+export const useRenameThread = () => {
   const queryClient = useQueryClient()
 
   return useMutation(
-    orpc.chats.rename.mutationOptions({
+    orpc.threads.rename.mutationOptions({
       onSuccess: () => {
-        void queryClient.invalidateQueries(orpc.chats.getAll.queryOptions())
+        void queryClient.invalidateQueries(orpc.threads.getMany.queryOptions())
 
-        toast.success('Chat renamed successfully')
+        toast.success('Thread renamed successfully')
       },
 
       onError: (error) => {
-        toast.error('Failed to rename chat', {
+        toast.error('Failed to rename thread', {
           description: error.message,
         })
       },

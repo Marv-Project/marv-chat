@@ -3,16 +3,16 @@ import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { orpc } from '@/orpc/client'
 
-export const useBranchChat = () => {
+export const useBranchThread = () => {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
   return useMutation(
-    orpc.chats.branch.mutationOptions({
+    orpc.threads.branch.mutationOptions({
       onSuccess: (data) => {
-        void queryClient.invalidateQueries(orpc.chats.getAll.queryOptions())
+        void queryClient.invalidateQueries(orpc.threads.getMany.queryOptions())
 
-        toast.success('Chat branched successfully')
+        toast.success('Thread branched successfully')
 
         void navigate({
           to: '/chat/$chatId',
@@ -22,7 +22,7 @@ export const useBranchChat = () => {
       },
 
       onError: (error) => {
-        toast.error('Failed to branch chat', {
+        toast.error('Failed to branch thread', {
           description: error.message,
         })
       },

@@ -16,7 +16,7 @@ import {
   ReasoningContent,
   ReasoningTrigger,
 } from '@/components/ai-elements/reasoning'
-import { useBranchChat } from '@/hooks/chat/use-branch-chat'
+import { useBranchThread } from '@/hooks/thread/use-branch-thread'
 import { Badge } from '@/components/ui/badge'
 import { getModelName } from '@/lib/ai-sdk/config'
 
@@ -112,7 +112,7 @@ const ChatMessageAction = ({
   regenerate,
 }: ChatMessageActionProps) => {
   const [, copyToClipboard] = useCopyToClipboard()
-  const { mutate: branchChat, isPending: isBranching } = useBranchChat()
+  const { mutate: branchThread, isPending: isBranching } = useBranchThread()
 
   if (isLoading) {
     return null
@@ -139,7 +139,7 @@ const ChatMessageAction = ({
   }
 
   const handleBranch = () => {
-    branchChat({ chatId, messageIndex })
+    branchThread({ threadId: chatId, messageIndex })
   }
 
   if (message.role === 'user') {
