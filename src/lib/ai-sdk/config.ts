@@ -137,6 +137,13 @@ export const aiChatModels = aiChatModelsConfig.flatMap((provider) =>
   })),
 )
 
+export const getModelName = (modelId: string): string => {
+  const model = aiChatModels.find((m) => m.id === modelId)
+  return model?.name ?? modelId
+}
+
+export const DEFAULT_CHAT_MODEL = 'google/gemini-2.5-flash-lite'
+
 type FullChatModelId = `${AIProvider} > ${AIChatModelConfig['id']}`
 
 export const getFullChatModelId = (modelId: string): FullChatModelId => {

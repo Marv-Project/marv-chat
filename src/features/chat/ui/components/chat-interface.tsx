@@ -13,7 +13,7 @@ import type { AppUIMessage } from '@/lib/ai-sdk/types'
 import { Messages } from '@/features/chat/ui/components/chat-messages'
 import { MultiModalInput } from '@/features/chat/ui/components/chat-multimodal-input'
 import { ChatHeader } from '@/features/chat/ui/components/chat-header'
-import { useSelectedModel } from '@/features/chat/ui/components/chat-model-selector'
+import { useSelectedModel } from '@/lib/ai-sdk/hooks'
 
 interface ChatInterfaceProps {
   id: string
@@ -47,14 +47,16 @@ export const ChatInterface = ({ id, initialMessages }: ChatInterfaceProps) => {
             body: {
               id: request.id,
               message: lastMessage,
-              modelId: selectedModelRef.current,
+              selectedChatModel: selectedModelRef.current,
               ...request.body,
             },
           }
         },
       }),
       onFinish: () => {
-        void queryClient?.invalidateQueries(orpc?.chats.getAll.queryOptions())
+        void queryClient?.invalidateQueries(
+          orpc?.threads.getMany.queryOptions(),
+        )
       },
       onError: (error) => {
         console.error(error)

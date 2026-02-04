@@ -98,9 +98,16 @@ export const Route = createFileRoute('/api/ai/chat')({
           }
 
           let validatedMessages: AppUIMessage[] = []
+
+          // Normalize incoming message to ensure metadata exists
+          const normalizedMessage: AppUIMessage = {
+            ...message,
+            metadata: message.metadata ?? { createdAt: new Date() },
+          }
+
           const messagesToValidate = [
             ...convertToUIMessages(messagesFromDb),
-            message,
+            normalizedMessage,
           ]
 
           try {
@@ -124,15 +131,20 @@ export const Route = createFileRoute('/api/ai/chat')({
           }
 
           // Only save user messages to the database (not tool approval responses)
-          if (message.role === 'user') {
+          // Skip if message already exists (e.g., when regenerating a response)
+          const messageExists = messagesFromDb.some(
+            (msg) => msg.id === normalizedMessage.id,
+          )
+
+          if (normalizedMessage.role === 'user' && !messageExists) {
             await saveMessages({
               messages: [
                 {
-                  id: message.id,
+                  id: normalizedMessage.id,
                   threadId: id,
                   role: 'user',
-                  parts: message.parts,
-                  metadata: message.metadata,
+                  parts: normalizedMessage.parts,
+                  metadata: normalizedMessage.metadata,
                   createdAt: new Date(),
                   updatedAt: new Date(),
                 },
@@ -192,10 +204,19 @@ export const Route = createFileRoute('/api/ai/chat')({
             },
 
             onFinish: async ({ messages: finishedMessages }) => {
-              if (finishedMessages.length > 0) {
-                // normal flow - save all finished messages
+              // Filter to only save NEW messages (assistant responses)
+              // User messages are already saved before streaming starts
+              const newMessages = finishedMessages.filter(
+                (msg) =>
+                  msg.role === 'assistant' &&
+                  !messagesToValidate.some(
+                    (existing) => existing.id === msg.id,
+                  ),
+              )
+
+              if (newMessages.length > 0) {
                 await saveMessages({
-                  messages: finishedMessages.map((currentMessage) => ({
+                  messages: newMessages.map((currentMessage) => ({
                     id: currentMessage.id,
                     threadId: id,
                     role: currentMessage.role,
@@ -205,33 +226,20 @@ export const Route = createFileRoute('/api/ai/chat')({
                     updatedAt: new Date(),
                   })),
                 })
-              } else {
-                for (const finishedMsg of finishedMessages) {
-                  const existingMsg = messagesToValidate.find(
-                    (msg) => msg.id === finishedMsg.id,
-                  )
+              }
 
-                  if (existingMsg) {
-                    await updateMessage({
-                      id: finishedMsg.id,
-                      parts: finishedMsg.parts,
-                      updatedAt: new Date(),
-                    })
-                  } else {
-                    await saveMessages({
-                      messages: [
-                        {
-                          id: finishedMsg.id,
-                          threadId: id,
-                          role: finishedMsg.role,
-                          parts: finishedMsg.parts,
-                          metadata: finishedMsg.metadata,
-                          createdAt: new Date(),
-                          updatedAt: new Date(),
-                        },
-                      ],
-                    })
-                  }
+              // Update any existing messages that may have changed (e.g., tool approvals)
+              for (const finishedMsg of finishedMessages) {
+                const existingMsg = messagesToValidate.find(
+                  (msg) => msg.id === finishedMsg.id,
+                )
+
+                if (existingMsg) {
+                  await updateMessage({
+                    id: finishedMsg.id,
+                    parts: finishedMsg.parts,
+                    updatedAt: new Date(),
+                  })
                 }
               }
             },
