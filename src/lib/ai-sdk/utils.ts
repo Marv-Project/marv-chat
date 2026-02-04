@@ -1,43 +1,27 @@
-import { generateText } from 'ai'
-import type { AppUIMessage } from '@/lib/ai-sdk/types'
-import { registry } from '@/lib/ai-sdk/registry'
-import { logger } from '@/lib/logger'
+import type { UIMessagePart, UITools } from 'ai'
+import type { AppUIMessage, CustomUIDataTypes } from '@/lib/ai-sdk/types'
+import type { MessageFromDB } from '@/lib/db/schemas'
 
-const titlePrompt = `Generate a very short chat title (2-5 words max) based on the user's message.
-Rules:
-- Maximum 30 characters
-- No quotes, colons, hashtags, or markdown
-- Just the topic/intent, not a full sentence
-- If the message is a greeting like "hi" or "hello", respond with just "New conversation"
-- Be concise: "Weather in NYC" not "User asking about the weather in New York City"`
-
-function getTextFromMessage(message: AppUIMessage): string {
+export const getTextFromMessage = ({
+  message,
+}: {
+  message: AppUIMessage
+}): string => {
   return message.parts
     .filter((part) => part.type === 'text')
     .map((part) => (part as { type: 'text'; text: string }).text)
     .join('')
 }
 
-export const generateTitleFromUserMessage = async ({
-  message,
-}: {
-  message: AppUIMessage
-}) => {
-  const prompt = getTextFromMessage(message)
-  if (!prompt.trim()) {
-    return 'New conversation'
-  }
-
-  try {
-    const { text: title } = await generateText({
-      model: registry.languageModel('ollama::gpt-oss:120b'),
-      system: titlePrompt,
-      prompt,
-    })
-
-    return title
-  } catch (error) {
-    logger.error({ err: error }, 'Failed to generate title')
-    return 'New conversation'
-  }
+export const convertToUIMessages = (
+  messages: MessageFromDB[],
+): AppUIMessage[] => {
+  return messages.map((message) => ({
+    id: message.id,
+    role: message.role,
+    parts: message.parts as UIMessagePart<CustomUIDataTypes, UITools>[],
+    metadata: {
+      createdAt: message.createdAt,
+    },
+  }))
 }

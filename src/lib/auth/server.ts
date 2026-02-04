@@ -113,7 +113,7 @@ export const auth = betterAuth({
   user: {
     additionalFields: {
       type: {
-        type: 'string',
+        type: ['guest', 'registered'] as schema.UserTypeEnum[],
         required: true,
         defaultValue: 'guest',
         input: false,

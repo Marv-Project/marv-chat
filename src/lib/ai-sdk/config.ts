@@ -1,43 +1,46 @@
-import { registry } from './registry'
+export type AIProvider = 'google' | 'ollama' | 'openrouter' | 'gateway'
 
-export type AIProvider = 'google' | 'ollama' | 'openrouter'
+interface AIProviderConfig {
+  id: string
+  name: string
+  models: AIChatModelConfig[]
+}
 
-export const AI_MODELS_CONFIG = [
+interface AIChatModelConfig {
+  id: string
+  providerId: AIProvider
+  name: string
+  uiName: string
+}
+
+export const aiChatModelsConfig: AIProviderConfig[] = [
   {
     id: 'google',
     name: 'Google',
     models: [
       {
         id: 'gemini-2.5-flash',
+        providerId: 'google',
         name: 'Gemini 2.5 Flash',
-        capabilities: {
-          reasoning: false,
-          webSearch: true,
-        },
+        uiName: 'Gemini 2.5 Flash',
       },
       {
         id: 'gemini-2.5-flash-lite',
+        providerId: 'google',
         name: 'Gemini 2.5 Flash Lite',
-        capabilities: {
-          reasoning: false,
-          webSearch: true,
-        },
+        uiName: 'Gemini 2.5 Flash Lite',
       },
       {
         id: 'gemini-2.5-flash-reasoning',
+        providerId: 'google',
         name: 'Gemini 2.5 Flash (Reasoning)',
-        capabilities: {
-          reasoning: true,
-          webSearch: true,
-        },
+        uiName: 'Gemini 2.5 Flash',
       },
       {
         id: 'gemini-2.5-flash-lite-reasoning',
+        providerId: 'google',
         name: 'Gemini 2.5 Flash Lite (Reasoning)',
-        capabilities: {
-          reasoning: true,
-          webSearch: true,
-        },
+        uiName: 'Gemini 2.5 Flash Lite',
       },
     ],
   },
@@ -48,51 +51,110 @@ export const AI_MODELS_CONFIG = [
     models: [
       {
         id: 'kimi-k2.5',
+        providerId: 'ollama',
         name: 'Kimi K2.5',
-        capabilities: {
-          reasoning: true,
-          webSearch: false,
-        },
+        uiName: 'Kimi K2.5',
       },
       {
         id: 'deepseek-v3.1:671b',
+        providerId: 'ollama',
         name: 'DeepSeek V3.1 671B',
-        capabilities: {
-          reasoning: true,
-          webSearch: false,
-        },
+        uiName: 'DeepSeek V3.1 671B',
       },
       {
         id: 'deepseek-v3.2',
+        providerId: 'ollama',
         name: 'DeepSeek V3.2',
-        capabilities: {
-          reasoning: true,
-          webSearch: false,
-        },
+        uiName: 'DeepSeek V3.2',
+      },
+    ],
+  },
+
+  {
+    id: 'gateway',
+    name: 'Vercel Gateway',
+    models: [
+      // Anthropic
+      {
+        id: 'anthropic/claude-haiku-4.5',
+        name: 'Claude Haiku 4.5',
+        providerId: 'gateway',
+        uiName: 'Claude Haiku 4.5',
+      },
+      {
+        id: 'anthropic/claude-sonnet-4.5',
+        name: 'Claude Sonnet 4.5',
+        providerId: 'gateway',
+        uiName: 'Claude Sonnet 4.5',
+      },
+      {
+        id: 'anthropic/claude-opus-4.5',
+        name: 'Claude Opus 4.5',
+        providerId: 'gateway',
+        uiName: 'Claude Opus 4.5',
+      },
+      // OpenAI
+      {
+        id: 'openai/gpt-4.1-mini',
+        name: 'GPT-4.1 Mini',
+        providerId: 'gateway',
+        uiName: 'GPT-4.1 Mini',
+      },
+      {
+        id: 'openai/gpt-5.2',
+        name: 'GPT-5.2',
+        providerId: 'gateway',
+        uiName: 'GPT-5.2',
+      },
+      // Google
+      {
+        id: 'google/gemini-2.5-flash-lite',
+        name: 'Gemini 2.5 Flash Lite',
+        providerId: 'gateway',
+        uiName: 'Gemini 2.5 Flash Lite',
+      },
+      {
+        id: 'google/gemini-3-pro-preview',
+        name: 'Gemini 3 Pro',
+        providerId: 'gateway',
+        uiName: 'Gemini 3 Pro',
+      },
+      // xAI
+      {
+        id: 'xai/grok-4.1-fast-non-reasoning',
+        name: 'Grok 4.1 Fast',
+        providerId: 'gateway',
+        uiName: 'Grok 4.1 Fast',
       },
     ],
   },
 ]
 
-const providerLookup = new Map(
-  AI_MODELS_CONFIG.flatMap((p) => p.models.map((m) => [m.id, p.id])),
+export const aiChatModels = aiChatModelsConfig.flatMap((provider) =>
+  provider.models.map((model) => ({
+    ...model,
+    providerId: provider.id,
+  })),
 )
 
-export const getLanguageModel = (modelId: string) => {
-  const providerId = providerLookup.get(modelId)
-  if (!providerId) throw new Error(`Unknown model ID: ${modelId}`)
-  return registry.languageModel(
-    `${providerId}::${modelId}` as `${AIProvider}::${string}`,
-  )
-}
+type FullChatModelId = `${AIProvider} > ${AIChatModelConfig['id']}`
 
-export const getModelName = (modelId: string): string => {
-  const providerId = providerLookup.get(modelId)
-  if (!providerId) return modelId
+export const getFullChatModelId = (modelId: string): FullChatModelId => {
+  const SEPARATOR = ' > '
 
-  return (
-    AI_MODELS_CONFIG.find((p) => p.id === providerId)?.models.find(
-      (m) => m.id === modelId,
-    )?.name || modelId
+  const selectedModel = aiChatModels.find((model) => model.id === modelId)
+
+  if (!selectedModel) {
+    throw new Error(`Model ${modelId} not found`)
+  }
+
+  const selectedProvider = aiChatModelsConfig.find(
+    (provider) => provider.id === selectedModel.providerId,
   )
+
+  if (!selectedProvider) {
+    throw new Error(`Provider ${selectedModel.providerId} not found`)
+  }
+
+  return `${selectedProvider.id}${SEPARATOR}${selectedModel.id}` as FullChatModelId
 }

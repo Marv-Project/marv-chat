@@ -27,7 +27,7 @@ export const messageTable = pgTable(
       .references(() => threadTable.id, { onDelete: 'cascade' }),
     role: messageRoleEnum('role').notNull(),
     parts: json('parts').$type<MessagePart[]>().notNull(),
-    metadata: json('metadata').$type<MessageMetadata | null>(),
+    metadata: json('metadata').$type<MessageMetadata | undefined>(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at')
       .notNull()

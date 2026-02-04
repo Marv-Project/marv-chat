@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-condition */
 import { v4 as uuidV4 } from 'uuid'
 import { asc, eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
@@ -5,13 +6,12 @@ import { messageTable, threadTable } from '@/lib/db/schemas'
 import { ChatSDKError } from '@/lib/errors'
 import { logger } from '@/lib/logger'
 
-export const getThreadById = async (threadId: string) => {
+export const getThreadById = async ({ threadId }: { threadId: string }) => {
   try {
     const [selectedThread] = await db
       .select()
       .from(threadTable)
       .where(eq(threadTable.id, threadId))
-      .limit(1)
 
     if (!selectedThread) return null
 
@@ -56,19 +56,13 @@ export const updateThreadTitleById = async ({
   title: string
 }) => {
   try {
-    const [thread] = await db
+    return await db
       .update(threadTable)
       .set({ title })
       .where(eq(threadTable.id, threadId))
-      .returning()
-
-    return thread
   } catch (error) {
-    logger.error({ err: error }, 'Failed to update thread title')
-    throw new ChatSDKError(
-      'bad_request:database',
-      'Failed to update thread title',
-    )
+    logger.warn({ err: error, threadId }, 'Failed to update title for thread')
+    return
   }
 }
 
