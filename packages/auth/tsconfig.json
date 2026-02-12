@@ -1,0 +1,15 @@
+{
+  "extends": "@marv-chat/config/tsconfig.base.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "composite": true,
+    "baseUrl": ".",
+    "paths": {
+      "@marv-chat/auth": ["./src/index.ts"],
+      "@marv-chat/auth/*": ["./src/*"]
+    }
+  }
+}
