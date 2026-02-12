@@ -34,11 +34,6 @@
     "db:down": "turbo -F @marv-chat/db db:down",
     "lint": "turbo run lint"
   },
-  "dependencies": {
-    "@marv-chat/env": "workspace:*",
-    "dotenv": "catalog:",
-    "zod": "catalog:"
-  },
   "devDependencies": {
     "@marv-chat/config": "workspace:*",
     "@marv-chat/eslint-config": "workspace:*",

@@ -4,11 +4,6 @@
   "workspaces": {
     "": {
       "name": "marv-chat",
-      "dependencies": {
-        "@marv-chat/env": "workspace:*",
-        "dotenv": "catalog:",
-        "zod": "catalog:",
-      },
       "devDependencies": {
         "@marv-chat/config": "workspace:*",
         "@marv-chat/eslint-config": "workspace:*",
