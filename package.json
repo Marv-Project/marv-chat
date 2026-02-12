@@ -9,8 +9,12 @@
     ],
     "catalog": {
       "@types/node": "^25.2.3",
+      "@types/pg": "^8.16.0",
       "dotenv": "^17.2.4",
+      "drizzle-kit": "^0.31.9",
+      "drizzle-orm": "^0.45.1",
       "eslint": "^10.0.0",
+      "pg": "^8.18.0",
       "typescript": "^5.9.3",
       "zod": "^4.3.6"
     }
@@ -20,9 +24,18 @@
     "check-types": "turbo check-types",
     "dev": "turbo dev",
     "dev:web": "turbo -F web dev",
+    "db:push": "turbo -F @marv-chat/db db:push",
+    "db:studio": "turbo -F @marv-chat/db db:studio",
+    "db:generate": "turbo -F @marv-chat/db db:generate",
+    "db:migrate": "turbo -F @marv-chat/db db:migrate",
+    "db:start": "turbo -F @marv-chat/db db:start",
+    "db:watch": "turbo -F @marv-chat/db db:watch",
+    "db:stop": "turbo -F @marv-chat/db db:stop",
+    "db:down": "turbo -F @marv-chat/db db:down",
     "lint": "turbo run lint"
   },
   "dependencies": {
+    "@marv-chat/env": "workspace:*",
     "dotenv": "catalog:",
     "zod": "catalog:"
   },

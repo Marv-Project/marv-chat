@@ -2,6 +2,7 @@
 
 import { tanstackConfig } from '@tanstack/eslint-config'
 import { defineConfig } from 'eslint/config'
+import tseslint from 'typescript-eslint'
 
 /**
  * A shared ESLint configuration for the repository.
@@ -19,6 +20,11 @@ export default defineConfig([
   },
   {
     files: ['**/*.ts', '**/*.tsx'],
+    extends: [
+      ...tseslint.configs.recommended,
+      ...tseslint.configs.recommendedTypeChecked,
+      ...tseslint.configs.stylisticTypeChecked,
+    ],
     rules: {
       '@typescript-eslint/array-type': 'off',
       '@typescript-eslint/consistent-type-definitions': 'off',
