@@ -1,0 +1,25 @@
+{
+  "name": "@marv-chat/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@marv-chat/db": "workspace:*",
+    "@marv-chat/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@marv-chat/config": "workspace:*",
+    "@marv-chat/eslint-config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

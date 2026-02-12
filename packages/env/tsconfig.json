@@ -3,7 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@marv-chat/env": ["./src/*"]
+      "@marv-chat/env": ["./src/index.ts"],
+      "@marv-chat/env/*": ["./src/*"]
     }
   }
 }
