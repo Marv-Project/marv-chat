@@ -14,6 +14,10 @@
     }
   },
   "scripts": {
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev": "turbo dev",
+    "dev:web": "turbo -F web dev",
     "lint": "turbo run lint"
   },
   "devDependencies": {
