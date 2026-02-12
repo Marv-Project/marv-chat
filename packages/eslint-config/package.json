@@ -1,0 +1,16 @@
+{
+  "name": "@marv-chat/eslint-config",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./base": "./base.js"
+  },
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@tanstack/eslint-config": "^0.3.4",
+    "eslint": "catalog:"
+  }
+}
