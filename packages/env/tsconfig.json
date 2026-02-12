@@ -1,0 +1,9 @@
+{
+  "extends": "@marv-chat/config/tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@marv-chat/env": ["./src/*"]
+    }
+  }
+}

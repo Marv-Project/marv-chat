@@ -9,8 +9,10 @@
     ],
     "catalog": {
       "@types/node": "^25.2.3",
+      "dotenv": "^17.2.4",
       "eslint": "^10.0.0",
-      "typescript": "^5.9.3"
+      "typescript": "^5.9.3",
+      "zod": "^4.3.6"
     }
   },
   "scripts": {
@@ -19,6 +21,10 @@
     "dev": "turbo dev",
     "dev:web": "turbo -F web dev",
     "lint": "turbo run lint"
+  },
+  "dependencies": {
+    "dotenv": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@marv-chat/config": "workspace:*",
