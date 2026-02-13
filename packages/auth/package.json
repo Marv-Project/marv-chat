@@ -2,8 +2,11 @@
   "name": "@marv-chat/auth",
   "type": "module",
   "exports": {
-    ".": {
-      "default": "./src/index.ts"
+    "./server": {
+      "default": "./src/server.ts"
+    },
+    "./client": {
+      "default": "./src/client.ts"
     },
     "./*": {
       "default": "./src/*.ts"

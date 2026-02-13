@@ -8,7 +8,6 @@
     "composite": true,
     "baseUrl": ".",
     "paths": {
-      "@marv-chat/auth": ["./src/index.ts"],
       "@marv-chat/auth/*": ["./src/*"]
     }
   }
