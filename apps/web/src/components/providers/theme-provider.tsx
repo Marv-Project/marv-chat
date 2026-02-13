@@ -101,10 +101,7 @@ export function ThemeProvider({
     <ThemeProviderContext {...props} value={value}>
       <ScriptOnce>
         {/* Apply theme early to avoid FOUC */}
-        {`document.documentElement.classList.toggle(
-            'dark',
-            localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)
-            )`}
+        {`document.documentElement.classList.toggle('dark', localStorage.getItem(${JSON.stringify(storageKey)}) === 'dark' || (localStorage.getItem(${JSON.stringify(storageKey)}) === null && window.matchMedia('(prefers-color-scheme: dark)').matches) )`}
       </ScriptOnce>
       {children}
     </ThemeProviderContext>
