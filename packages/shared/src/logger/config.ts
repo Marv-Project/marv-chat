@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import pino from 'pino'
 import type { LoggerOptions } from 'pino'
 
@@ -53,6 +52,10 @@ export const loggerConfig: LoggerOptions = {
       '*.password',
       '*.token',
       '*.apiKey',
+      '*.api_key',
+      '*.authorization',
+      '*.cookie',
+      '*.secret',
     ],
     remove: true,
   },

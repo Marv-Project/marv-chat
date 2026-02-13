@@ -81,7 +81,21 @@ async function handle({ request }: { request: Request }) {
     { method: request.method, path: new URL(request.url).pathname },
     '[ORPC - API Route]: Request received',
   )
-  const context = await createContext(request)
+
+  let context
+  try {
+    context = await createContext(request)
+  } catch (error) {
+    baseLogger.error(
+      {
+        err: error,
+        method: request.method,
+        path: new URL(request.url).pathname,
+      },
+      '[ORPC - API Route]: Failed to create context',
+    )
+    return new Response('Internal Server Error', { status: 500 })
+  }
 
   const rpcResult = await rpcHandler.handle(request, {
     prefix: '/api/orpc',
