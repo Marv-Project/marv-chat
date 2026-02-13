@@ -6,7 +6,7 @@ import { z } from 'zod'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 dotenv.config({
-  path: path.resolve(__dirname, '../../apps/web/.env'),
+  path: path.resolve(__dirname, '../../../apps/web/.env'),
 })
 
 export const env = createEnv({

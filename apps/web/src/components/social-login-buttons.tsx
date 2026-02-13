@@ -12,6 +12,7 @@ const routeApi = getRouteApi('/_auth')
 export const SocialLoginButtons = () => {
   const [isPendingGithub, startTransitionGithub] = useTransition()
   const [isPendingGoogle, startTransitionGoogle] = useTransition()
+  const isPending = isPendingGithub || isPendingGoogle
 
   const { callbackURL } = routeApi.useSearch()
 
@@ -54,9 +55,9 @@ export const SocialLoginButtons = () => {
         variant="outline"
         size="lg"
         onClick={handleSocialLoginGithub}
-        disabled={isPendingGithub}
+        disabled={isPending}
       >
-        {isPendingGithub ? <Spinner /> : <FaGithub />} Continue with GitHub
+        {isPending ? <Spinner /> : <FaGithub />} Continue with GitHub
       </Button>
 
       <Button
@@ -64,9 +65,9 @@ export const SocialLoginButtons = () => {
         variant="outline"
         size="lg"
         onClick={handleSocialLoginGoogle}
-        disabled={isPendingGoogle}
+        disabled={isPending}
       >
-        {isPendingGoogle ? <Spinner /> : <FcGoogle />} Continue with Google
+        {isPending ? <Spinner /> : <FcGoogle />} Continue with Google
       </Button>
     </div>
   )
