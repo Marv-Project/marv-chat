@@ -16,11 +16,7 @@
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "radix-ui": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:",
-    "shadcn": "catalog:",
     "tailwind-merge": "catalog:",
-    "tailwindcss": "catalog:",
     "tw-animate-css": "catalog:"
   },
   "devDependencies": {
@@ -28,6 +24,12 @@
     "@marv-chat/eslint-config": "workspace:*",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "shadcn": "catalog:",
+    "tailwindcss": "catalog:",
     "typescript": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:"
   }
 }
