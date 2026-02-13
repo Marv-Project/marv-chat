@@ -121,6 +121,7 @@ export const Route = createFileRoute('/api/orpc/$')({
       PUT: handle,
       PATCH: handle,
       DELETE: handle,
+      OPTIONS: handle,
     },
   },
 })
