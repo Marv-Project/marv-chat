@@ -8,4 +8,4 @@
  * export function truncate(text: string, maxLength: number): string { ... }
  */
 
-export {}
+export * from './validate-callback-url'

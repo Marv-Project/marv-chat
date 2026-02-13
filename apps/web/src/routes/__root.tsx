@@ -11,6 +11,7 @@ import { TooltipProvider } from '@marv-chat/ui/components/ui/tooltip'
 import { Toaster } from '@marv-chat/ui/components/ui/sonner'
 import appCss from '@/styles.css?url'
 import { ThemeProvider } from '@/components/providers/theme-provider'
+import { getAuthFn } from '@/functions/get-auth-fn'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -34,6 +35,12 @@ export const Route = createRootRoute({
     ],
   }),
 
+  beforeLoad: async () => {
+    const auth = await getAuthFn()
+
+    return { auth }
+  },
+
   component: RootComponent,
 })
 
@@ -47,7 +54,7 @@ function RootComponent() {
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>

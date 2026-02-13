@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@marv-chat/api": "workspace:*",
+    "@marv-chat/auth": "workspace:*",
+    "@marv-chat/env": "workspace:*",
     "@marv-chat/ui": "workspace:*",
     "@marv-chat/shared": "workspace:*",
     "@orpc/client": "catalog:",
@@ -26,12 +28,17 @@
     "@tanstack/react-router-ssr-query": "catalog:",
     "@tanstack/react-start": "catalog:",
     "@tanstack/router-plugin": "catalog:",
+    "@tanstack/zod-adapter": "catalog:",
     "lucide-react": "catalog:",
+    "motion": "catalog:",
     "nitro": "npm:nitro-nightly@latest",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-icons": "catalog:",
+    "sonner": "catalog:",
     "tailwindcss": "catalog:",
-    "vite-tsconfig-paths": "^6.0.2"
+    "vite-tsconfig-paths": "^6.0.2",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@marv-chat/eslint-config": "workspace:*",

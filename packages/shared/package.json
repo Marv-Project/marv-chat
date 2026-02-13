@@ -11,6 +11,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@marv-chat/env": "workspace:*",
     "pino": "^10.3.1",
     "zod": "catalog:"
   },
