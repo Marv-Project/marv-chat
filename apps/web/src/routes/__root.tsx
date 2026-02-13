@@ -1,8 +1,16 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
+import {
+  HeadContent,
+  Outlet,
+  Scripts,
+  createRootRoute,
+} from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
-import appCss from '../styles.css?url'
+import { TooltipProvider } from '@marv-chat/ui/components/ui/tooltip'
+import { Toaster } from '@marv-chat/ui/components/ui/sonner'
+import appCss from '@/styles.css?url'
+import { ThemeProvider } from '@/components/providers/theme-provider'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -25,8 +33,17 @@ export const Route = createRootRoute({
       },
     ],
   }),
-  shellComponent: RootDocument,
+
+  component: RootComponent,
 })
+
+function RootComponent() {
+  return (
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
+  )
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
@@ -34,8 +51,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body>
-        {children}
+      <body className="selection:bg-primary selection:text-primary-foreground">
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <TooltipProvider>{children}</TooltipProvider>
+          <Toaster position="top-center" />
+        </ThemeProvider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',
