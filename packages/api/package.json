@@ -1,0 +1,37 @@
+{
+  "name": "@marv-chat/api",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./routers": {
+      "default": "./src/routers/index.ts"
+    },
+    "./context": {
+      "default": "./src/context.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "dependencies": {
+    "@marv-chat/auth": "workspace:*",
+    "@marv-chat/db": "workspace:*",
+    "@marv-chat/env": "workspace:*",
+    "@marv-chat/shared": "workspace:*",
+    "@orpc/client": "catalog:",
+    "@orpc/openapi": "catalog:",
+    "@orpc/server": "catalog:",
+    "@orpc/zod": "catalog:",
+    "dotenv": "catalog:",
+    "drizzle-orm": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@marv-chat/config": "workspace:*",
+    "@marv-chat/eslint-config": "workspace:*",
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
+  }
+}
