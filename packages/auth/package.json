@@ -16,8 +16,10 @@
   "dependencies": {
     "@marv-chat/db": "workspace:*",
     "@marv-chat/env": "workspace:*",
+    "@marv-chat/shared": "workspace:*",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
+    "@faker-js/faker": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
