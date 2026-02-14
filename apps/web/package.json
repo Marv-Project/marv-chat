@@ -9,6 +9,8 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@dicebear/collection": "catalog:",
+    "@dicebear/core": "catalog:",
     "@marv-chat/api": "workspace:*",
     "@marv-chat/auth": "workspace:*",
     "@marv-chat/env": "workspace:*",

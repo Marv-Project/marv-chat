@@ -1,4 +1,5 @@
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
+import { SidebarWrapper } from '@/components/sidebar-wrapper'
 
 export const Route = createFileRoute('/_app')({
   component: App,
@@ -16,8 +17,8 @@ export const Route = createFileRoute('/_app')({
 
 function App() {
   return (
-    <>
+    <SidebarWrapper>
       <Outlet />
-    </>
+    </SidebarWrapper>
   )
 }
