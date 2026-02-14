@@ -51,7 +51,7 @@ export const AppSidebarHeader = ({
         </SidebarGroupContent>
       </SidebarGroup>
 
-      <form>
+      <form onSubmit={(e) => e.preventDefault()}>
         <SidebarGroup className="px-0 py-0">
           <SidebarGroupContent className="relative">
             <Label htmlFor="search" className="sr-only">

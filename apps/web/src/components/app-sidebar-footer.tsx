@@ -77,13 +77,13 @@ export const AppSidebarFooter = ({
   )
 }
 
-type UserButtonPropps = {
+type UserButtonProps = {
   user: typeof auth.$Infer.Session.user
   onSignOut: () => void
   isMobile: boolean
 }
 
-const UserButton = ({ user, onSignOut, isMobile }: UserButtonPropps) => {
+const UserButton = ({ user, onSignOut, isMobile }: UserButtonProps) => {
   if (isMobile) {
     return (
       <Drawer>
