@@ -1,4 +1,3 @@
-import { relations } from 'drizzle-orm'
 import {
   boolean,
   index,
@@ -101,25 +100,6 @@ export const jwksTable = pgTable('jwks', {
   createdAt: timestamp('created_at').notNull(),
   expiresAt: timestamp('expires_at'),
 })
-
-export const userRelations = relations(userTable, ({ many }) => ({
-  sessions: many(sessionTable),
-  accounts: many(accountTable),
-}))
-
-export const sessionRelations = relations(sessionTable, ({ one }) => ({
-  user: one(userTable, {
-    fields: [sessionTable.userId],
-    references: [userTable.id],
-  }),
-}))
-
-export const accountRelations = relations(accountTable, ({ one }) => ({
-  user: one(userTable, {
-    fields: [accountTable.userId],
-    references: [userTable.id],
-  }),
-}))
 
 export type UserRoleEnum = InferEnum<typeof userRoleEnum>
 export type UserTypeEnum = InferEnum<typeof userTypeEnum>
