@@ -15,6 +15,7 @@ import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as ApiOrpcSplatRouteImport } from './routes/api/orpc.$'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth.$'
+import { Route as ApiAiSplatRouteImport } from './routes/api/ai.$'
 
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/_auth',
@@ -44,16 +45,23 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAiSplatRoute = ApiAiSplatRouteImport.update({
+  id: '/api/ai/$',
+  path: '/api/ai/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/login': typeof AuthLoginRoute
+  '/api/ai/$': typeof ApiAiSplatRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/orpc/$': typeof ApiOrpcSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/login': typeof AuthLoginRoute
+  '/api/ai/$': typeof ApiAiSplatRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/orpc/$': typeof ApiOrpcSplatRoute
 }
@@ -63,20 +71,22 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
   '/_app/': typeof AppIndexRoute
+  '/api/ai/$': typeof ApiAiSplatRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/orpc/$': typeof ApiOrpcSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/api/auth/$' | '/api/orpc/$'
+  fullPaths: '/' | '/login' | '/api/ai/$' | '/api/auth/$' | '/api/orpc/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/api/auth/$' | '/api/orpc/$'
+  to: '/' | '/login' | '/api/ai/$' | '/api/auth/$' | '/api/orpc/$'
   id:
     | '__root__'
     | '/_app'
     | '/_auth'
     | '/_auth/login'
     | '/_app/'
+    | '/api/ai/$'
     | '/api/auth/$'
     | '/api/orpc/$'
   fileRoutesById: FileRoutesById
@@ -84,6 +94,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRouteRoute: typeof AppRouteRouteWithChildren
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
+  ApiAiSplatRoute: typeof ApiAiSplatRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiOrpcSplatRoute: typeof ApiOrpcSplatRoute
 }
@@ -132,6 +143,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ai/$': {
+      id: '/api/ai/$'
+      path: '/api/ai/$'
+      fullPath: '/api/ai/$'
+      preLoaderRoute: typeof ApiAiSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -162,6 +180,7 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AppRouteRoute: AppRouteRouteWithChildren,
   AuthRouteRoute: AuthRouteRouteWithChildren,
+  ApiAiSplatRoute: ApiAiSplatRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiOrpcSplatRoute: ApiOrpcSplatRoute,
 }

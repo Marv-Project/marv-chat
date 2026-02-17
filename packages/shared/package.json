@@ -11,16 +11,19 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@ai-sdk/google": "catalog:",
+    "@marv-chat/db": "workspace:*",
     "@marv-chat/env": "workspace:*",
+    "@marv-chat/logger": "workspace:*",
+    "ai": "catalog:",
     "nanoid": "catalog:",
-    "pino": "^10.3.1",
+    "uuid": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@marv-chat/config": "workspace:*",
     "@marv-chat/eslint-config": "workspace:*",
     "eslint": "catalog:",
-    "pino-pretty": "^13.1.3",
     "typescript": "catalog:"
   }
 }
