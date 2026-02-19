@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { auth } from '@marv-chat/auth/server'
-import { baseLogger } from '@marv-chat/shared'
+import { baseLogger } from '@marv-chat/logger'
 
 const logger = baseLogger.child({ module: 'auth' })
 

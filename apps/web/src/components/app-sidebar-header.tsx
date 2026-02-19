@@ -51,21 +51,19 @@ export const AppSidebarHeader = ({
         </SidebarGroupContent>
       </SidebarGroup>
 
-      <form onSubmit={(e) => e.preventDefault()}>
-        <SidebarGroup className="px-0 py-0">
-          <SidebarGroupContent className="relative">
-            <Label htmlFor="search" className="sr-only">
-              Search
-            </Label>
-            <SidebarInput
-              id="search"
-              placeholder="Search your threads..."
-              className="pl-8"
-            />
-            <IconSearch className="pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2 opacity-50 select-none" />
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </form>
+      <SidebarGroup className="px-0 py-0">
+        <SidebarGroupContent className="relative">
+          <Label htmlFor="search" className="sr-only">
+            Search
+          </Label>
+          <SidebarInput
+            id="search"
+            placeholder="Search your threads..."
+            className="pl-8"
+          />
+          <IconSearch className="pointer-events-none absolute top-1/2 left-2 size-4 -translate-y-1/2 opacity-50 select-none" />
+        </SidebarGroupContent>
+      </SidebarGroup>
     </SidebarHeader>
   )
 }

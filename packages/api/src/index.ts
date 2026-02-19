@@ -1,5 +1,5 @@
 import { ORPCError, os } from '@orpc/server'
-import { baseLogger } from '@marv-chat/shared'
+import { baseLogger } from '@marv-chat/logger'
 import type { ORPCContext } from './context'
 
 export const o = os.$context<ORPCContext>()

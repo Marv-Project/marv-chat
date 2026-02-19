@@ -19,6 +19,7 @@
     "@marv-chat/auth": "workspace:*",
     "@marv-chat/db": "workspace:*",
     "@marv-chat/env": "workspace:*",
+    "@marv-chat/logger": "workspace:*",
     "@marv-chat/shared": "workspace:*",
     "@orpc/client": "catalog:",
     "@orpc/openapi": "catalog:",
