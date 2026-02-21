@@ -1,0 +1,10 @@
+{
+  "extends": "@marv-chat/config/tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@marv-chat/logger": ["./src/index.ts"],
+      "@marv-chat/logger/*": ["./src/*"]
+    }
+  }
+}

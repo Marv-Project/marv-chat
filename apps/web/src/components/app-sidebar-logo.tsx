@@ -1,9 +1,9 @@
-import { motion } from 'motion/react'
+import { m } from 'motion/react'
 
 import { Link } from '@tanstack/react-router'
 import { MarvIcon } from '@/components/marv-icon'
 
-const MotionLink = motion.create(Link)
+const MotionLink = m.create(Link)
 
 export const AppSidebarLogo = () => {
   return (

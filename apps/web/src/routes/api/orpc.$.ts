@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { onError } from '@orpc/server'
 import { orpcRouter } from '@marv-chat/api/routers'
-import { baseLogger } from '@marv-chat/shared'
+import { baseLogger } from '@marv-chat/logger'
 import { RPCHandler } from '@orpc/server/fetch'
 import { OpenAPIHandler } from '@orpc/openapi/fetch'
 import { OpenAPIReferencePlugin } from '@orpc/openapi/plugins'

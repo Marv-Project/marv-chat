@@ -2,18 +2,27 @@ import {
   HeadContent,
   Outlet,
   Scripts,
-  createRootRoute,
+  createRootRouteWithContext,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
+import { LazyMotion, domAnimation } from 'motion/react'
 
 import { TooltipProvider } from '@marv-chat/ui/components/ui/tooltip'
 import { Toaster } from '@marv-chat/ui/components/ui/sonner'
+import type { orpc } from '@/utils/orpc'
+import type { QueryClient } from '@tanstack/react-query'
 import appCss from '@/styles.css?url'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { getAuthFn } from '@/functions/get-auth-fn'
 
-export const Route = createRootRoute({
+interface AppRouterContext {
+  orpc: typeof orpc
+  queryClient: QueryClient
+}
+
+export const Route = createRootRouteWithContext<AppRouterContext>()({
   head: () => ({
     meta: [
       {
@@ -59,10 +68,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="selection:bg-primary selection:text-primary-foreground">
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-          <TooltipProvider>{children}</TooltipProvider>
-          <Toaster position="top-center" />
-        </ThemeProvider>
+        <LazyMotion features={domAnimation}>
+          <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+            <TooltipProvider>{children}</TooltipProvider>
+            <Toaster position="top-center" />
+          </ThemeProvider>
+        </LazyMotion>
         <TanStackDevtools
           config={{
             position: 'bottom-right',
@@ -71,6 +82,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             {
               name: 'Tanstack Router',
               render: <TanStackRouterDevtoolsPanel />,
+            },
+            {
+              name: 'Tanstack Query',
+              render: <ReactQueryDevtoolsPanel />,
             },
           ]}
         />

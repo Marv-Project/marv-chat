@@ -5,6 +5,12 @@
     ".": {
       "default": "./src/index.ts"
     },
+    "./schemas": {
+      "default": "./src/schemas/index.ts"
+    },
+    "./queries": {
+      "default": "./src/queries/index.ts"
+    },
     "./*": {
       "default": "./src/*.ts"
     }
@@ -22,6 +28,7 @@
   },
   "dependencies": {
     "@marv-chat/env": "workspace:*",
+    "@marv-chat/logger": "workspace:*",
     "dotenv": "catalog:",
     "drizzle-orm": "catalog:",
     "pg": "catalog:",

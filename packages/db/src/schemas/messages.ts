@@ -24,6 +24,7 @@ export const messageTable = pgTable(
       .references(() => threadTable.id, { onDelete: 'cascade' }),
     role: messageRoleEnum('role').notNull(),
     parts: json('parts').notNull(),
+    metadata: json('metadata'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at'),
   },
