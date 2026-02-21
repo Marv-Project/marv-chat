@@ -26,6 +26,7 @@ import { entitlementsByUserType } from '@marv-chat/shared/ai-sdk/entitlements'
 import { generateTitleFromUserMessage } from '@marv-chat/shared/ai-sdk/actions'
 import { convertToAppUIMessage } from '@marv-chat/shared/ai-sdk/utils'
 import { getLanguageModel } from '@marv-chat/shared/ai-sdk/providers'
+import { baseLogger } from '@marv-chat/logger'
 import type { AppUIMessage, PostBodyRequest } from '@marv-chat/shared'
 import type { UserTypeEnum } from '@marv-chat/db/schemas/auth'
 import type { MessageFromDB } from '@marv-chat/db/schemas'
@@ -67,7 +68,8 @@ export const Route = createFileRoute('/api/ai/$')({
             return new ChatSDKError('rate_limit:chat').toResponse()
           }
 
-          const isToolApprovalFlow = Boolean(messages)
+          const isToolApprovalFlow =
+            Array.isArray(messages) && messages.length > 0
 
           const thread = await getThreadById({ threadId: id })
           let messageFromDb: MessageFromDB[] = []
@@ -91,12 +93,12 @@ export const Route = createFileRoute('/api/ai/$')({
             titlePromise = generateTitleFromUserMessage({ message })
           }
 
-          const uiMessages = isToolApprovalFlow
+          const uiMessages: AppUIMessage[] = isToolApprovalFlow
             ? convertToAppUIMessage(messageFromDb)
-            : ([
+            : [
                 ...convertToAppUIMessage(messageFromDb),
-                message,
-              ] as AppUIMessage[])
+                ...(message ? [message] : []),
+              ]
 
           if (message?.role === 'user') {
             await saveMessages({
@@ -129,6 +131,10 @@ export const Route = createFileRoute('/api/ai/$')({
                 result.toUIMessageStream({
                   sendReasoning: true,
                   sendSources: true,
+                  onError: (error) => {
+                    baseLogger.error({ error }, 'Stream error in chat API')
+                    return 'Oops, an error occurred!'
+                  },
                 }),
               )
 
