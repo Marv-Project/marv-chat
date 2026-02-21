@@ -20,13 +20,15 @@ import {
   getMessageCountByUserId,
   getMessagesByThreadId,
   saveMessages,
+  updateMessageById,
 } from '@marv-chat/db/queries/message'
 import { entitlementsByUserType } from '@marv-chat/shared/ai-sdk/entitlements'
 import { generateTitleFromUserMessage } from '@marv-chat/shared/ai-sdk/actions'
 import { convertToAppUIMessage } from '@marv-chat/shared/ai-sdk/utils'
 import { getLanguageModel } from '@marv-chat/shared/ai-sdk/providers'
-import type { PostBodyRequest } from '@marv-chat/shared'
+import type { AppUIMessage, PostBodyRequest } from '@marv-chat/shared'
 import type { UserTypeEnum } from '@marv-chat/db/schemas/auth'
+import type { MessageFromDB } from '@marv-chat/db/schemas'
 import { authMiddleware } from '@/middlewares/auth'
 
 export const Route = createFileRoute('/api/ai/$')({
@@ -44,7 +46,7 @@ export const Route = createFileRoute('/api/ai/$')({
         }
 
         try {
-          const { id, message } = requestBody
+          const { id, message, messages } = requestBody
 
           const auth = context.auth
 
@@ -60,20 +62,26 @@ export const Route = createFileRoute('/api/ai/$')({
           })
 
           if (
-            messageCount > entitlementsByUserType[userType].maxMessagesPerDay
+            messageCount >= entitlementsByUserType[userType].maxMessagesPerDay
           ) {
             return new ChatSDKError('rate_limit:chat').toResponse()
           }
 
+          const isToolApprovalFlow = Boolean(messages)
+
           const thread = await getThreadById({ threadId: id })
-          const messageFromDb = await getMessagesByThreadId({ threadId: id })
+          let messageFromDb: MessageFromDB[] = []
           let titlePromise: Promise<string> | null = null
 
           if (thread) {
-            if (thread.userId && auth.user.id !== thread.userId) {
-              return new ChatSDKError('unauthorized:chat').toResponse()
+            if (thread.userId !== auth.user.id) {
+              return new ChatSDKError('forbidden:chat').toResponse()
             }
-          } else if (message.role === 'user') {
+
+            if (isToolApprovalFlow) {
+              messageFromDb = await getMessagesByThreadId({ threadId: id })
+            }
+          } else if (message?.role === 'user') {
             await saveThread({
               threadId: id,
               userId: auth.user.id,
@@ -83,9 +91,14 @@ export const Route = createFileRoute('/api/ai/$')({
             titlePromise = generateTitleFromUserMessage({ message })
           }
 
-          const uiMessages = [...convertToAppUIMessage(messageFromDb), message]
+          const uiMessages = isToolApprovalFlow
+            ? convertToAppUIMessage(messageFromDb)
+            : ([
+                ...convertToAppUIMessage(messageFromDb),
+                message,
+              ] as AppUIMessage[])
 
-          if (message.role === 'user') {
+          if (message?.role === 'user') {
             await saveMessages({
               messages: [
                 {
@@ -104,7 +117,7 @@ export const Route = createFileRoute('/api/ai/$')({
           const modelMessages = await convertToModelMessages(uiMessages)
 
           const stream = createUIMessageStream({
-            originalMessages: uiMessages,
+            originalMessages: isToolApprovalFlow ? uiMessages : undefined,
             execute: async ({ writer: dataStream }) => {
               const result = streamText({
                 model: getLanguageModel(),
@@ -130,20 +143,50 @@ export const Route = createFileRoute('/api/ai/$')({
             },
             generateId: generateUUID,
             onFinish: async ({ messages: finishedMessages }) => {
-              await saveMessages({
-                messages: finishedMessages.map((m) => {
-                  return {
-                    id: m.id,
+              if (isToolApprovalFlow) {
+                for (const finishedMsg of finishedMessages) {
+                  const existingMsg = uiMessages.find(
+                    (m) => m.id === finishedMsg.id,
+                  )
+
+                  if (existingMsg) {
+                    await updateMessageById({
+                      messageId: finishedMsg.id,
+                      parts: finishedMsg.parts,
+                      metadata: finishedMsg.metadata,
+                      updatedAt: new Date(),
+                    })
+                  } else {
+                    await saveMessages({
+                      messages: [
+                        {
+                          id: finishedMsg.id,
+                          threadId: id,
+                          role: finishedMsg.role,
+                          parts: finishedMsg.parts,
+                          metadata: finishedMsg.metadata,
+                          createdAt: new Date(),
+                          updatedAt: new Date(),
+                        },
+                      ],
+                    })
+                  }
+                }
+              } else if (finishedMessages.length > 0) {
+                await saveMessages({
+                  messages: finishedMessages.map((msg) => ({
+                    id: msg.id,
                     threadId: id,
-                    role: m.role,
-                    parts: m.parts,
-                    metadata: m.metadata,
+                    role: msg.role,
+                    parts: msg.parts,
+                    metadata: msg.metadata,
                     createdAt: new Date(),
                     updatedAt: new Date(),
-                  }
-                }),
-              })
+                  })),
+                })
+              }
             },
+            onError: () => 'Oops, an error occurred!',
           })
 
           return createUIMessageStreamResponse({ stream })

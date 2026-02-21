@@ -73,3 +73,24 @@ export const saveMessages = async ({
     throw new ChatSDKError('bad_request:database', 'Failed to save messages')
   }
 }
+
+export const updateMessageById = async ({
+  messageId,
+  parts,
+  metadata,
+  updatedAt,
+}: {
+  messageId: string
+  parts: MessageFromDB['parts']
+  metadata: MessageFromDB['metadata']
+  updatedAt: MessageFromDB['updatedAt']
+}) => {
+  try {
+    return await db
+      .update(messageTable)
+      .set({ parts, metadata, updatedAt })
+      .where(eq(messageTable.id, messageId))
+  } catch (_error) {
+    throw new ChatSDKError('bad_request:database', 'Failed to update message')
+  }
+}
