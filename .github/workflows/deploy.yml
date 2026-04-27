@@ -31,3 +31,6 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/marvchat:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/marvchat:${{ github.sha }}
           platforms: linux/amd64
+          build-args: |
+            VITE_APP_TITLE=${{ vars.VITE_APP_TITLE }}
+            VITE_APP_URL=${{ vars.VITE_APP_URL }}

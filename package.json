@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev --port 3000",
+    "dev": "vite dev --port 3002",
     "build": "prisma generate && vite build",
-    "preview": "vite preview --port 3000",
+    "preview": "vite preview --port 3002",
     "start": "bun .output/server/index.mjs",
     "test": "vitest run",
     "lint": "eslint",

@@ -36,9 +36,10 @@ FROM base AS release
 COPY --from=install /temp/prod/node_modules node_modules
 COPY --from=prerelease /usr/src/app/.output ./.output
 COPY --from=prerelease /usr/src/app/package.json .
+COPY --from=prerelease /usr/src/app/src/generated/prisma ./src/generated/prisma
 
 # run the app
-ENV NITRO_PORT=3001
+ENV NITRO_PORT=3002
 USER bun
-EXPOSE 3001/tcp
+EXPOSE 3002/tcp
 ENTRYPOINT [ "bun", "run", ".output/server/index.mjs" ]
